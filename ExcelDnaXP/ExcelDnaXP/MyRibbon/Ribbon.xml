@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<customUI xmlns='http://schemas.microsoft.com/office/2009/07/customui'  loadImage='LoadImage' onLoad='OnLoad'>
+	<ribbon>
+		<tabs>
+			<tab id="tab1" label="Radiant">
+				<!--测试专用 后期移出-->
+				<group id="TextGruop" label="测试">
+
+					<button id="TestButton" label="测试" onAction="TestAction" getImage="获取按钮图片"  getEnabled='GetButtonEnabled' />
+					<button id="GenerateButton" label="生成数据" onAction="生成Action" image="Image1" getEnabled='GetButtonEnabled' />
+				</group>
+				<!--数据的生成删除操作 -->
+				<group id="DataGruop" label="数据">
+					<button id="CalculateButton" label="名字填充" onAction="计算Action" image="Image1" getEnabled='GetButtonEnabled' />
+					<button id="InsertButton" label="隔行插入" onAction="InsertRange" image="Image1"  getEnabled='GetButtonEnabled' />
+
+					<menu id="MainMenu" label="多级菜单" image="Image1">
+
+						<button id="SubMenu1" label="子菜单项1" onAction="SubMenu1Action"  getEnabled='GetButtonEnabled' />
+
+						<menu id="SubMenu" label="子菜单">
+							<button id="SubSubMenu1" label="子子菜单项1" onAction="SubSubMenu1Action"  getEnabled='GetButtonEnabled' />
+							<button id="SubSubMenu2" label="子子菜单项2" onAction="SubSubMenu2Action" getEnabled='GetButtonEnabled' />
+						</menu>
+
+						<menuSeparator id="MenuSeparator" />
+						<button id="SubMenu2" label="带分隔线的子菜单项" onAction="SubMenu2Action"  getEnabled='GetButtonEnabled' />
+					</menu>
+				</group>
+				<!--文件操作-->
+				<group id="WorkGroup" label="文件操作">
+					<menu id="批注" label="批注" image="Image1">
+						<button id="添加批注" label="添加批注" onAction="添加批注" image="Image1" screentip="添加单个批注"  getEnabled='GetButtonEnabled' />
+						<button id="删除批注" label="删除批注" onAction="删除批注"  image="Image1" />
+						<button id="删除所有批注" label="删除所有批注" onAction="删除所有批注" image="Image1" />
+					</menu>
+					<menu id="密码" label="密码" image="Image1" getEnabled='GetButtonEnabled'>
+						<!--<button id="破解excel文件" label="破解Excel文件" onAction="破解excel文件" image="Image1" screentip="清除文件密码" />-->
+						<button id="破解工作薄密码" label="破解工作薄密码" onAction="破解工作薄密码" image="Image1" screentip="清除工作簿密码" />
+						<button id="破解工作表密码" label="破解工作表密码" onAction="破解工作表密码"  image="Image1" screentip="清除工作表密码" />
+						<button id="破解VBE密码" label="破解VBA密码" onAction="破解VBA密码" image="Image1" screentip="清除VBE密码" />
+					</menu>
+				</group>
+				<group id="条形码Group" label="条形码">
+					<menu id="条码Menu" label="条码" image="Image1">
+						<button id="条形码" label="条形码" onAction="生成条形码" image="Image1" screentip="生成条形码" />
+						<button id="二维码" label="二维码" onAction="生成二维码"  image="Image1" screentip="生成二维码" />
+						<button id="批量生成条形码" label="批量生成条形码" onAction="批量生成条形码"  image="Image1" screentip="批量生成条形码" />
+					</menu>
+				</group>
+				<!-- 注册-->
+				<group id="注册Group" label="注册使用" autoScale="false">
+					<button id="注册" label="注册" onAction="注册" image="Image1"  size="normal"  screentip="注册完成后可以使用所有功能" />
+				</group>
+			</tab>
+		</tabs>
+	</ribbon>
+</customUI>
