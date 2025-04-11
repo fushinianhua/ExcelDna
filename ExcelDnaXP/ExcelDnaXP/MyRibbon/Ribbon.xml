@@ -6,15 +6,15 @@
 				<!--测试专用 后期移出-->
 				<group id="TextGruop" label="测试">
 
-					<button id="TestButton" label="测试" onAction="TestAction" getImage="获取按钮图片"  getEnabled='GetButtonEnabled' />
+					<button id="TestButton"  onAction="TestAction" getImage="获取按钮图片"  size="large" getEnabled='GetButtonEnabled' getLabel='获取文本文字' />
 					<button id="GenerateButton" label="生成数据" onAction="生成Action" image="Image1" getEnabled='GetButtonEnabled' />
 				</group>
 				<!--数据的生成删除操作 -->
 				<group id="DataGruop" label="数据">
-					<button id="CalculateButton" label="名字填充" onAction="计算Action" image="Image1" getEnabled='GetButtonEnabled' />
+					<button id="CalculateButton" label="名字填充" onAction="计算Action" image="填充选择" size="large" getEnabled='GetButtonEnabled' />
 					<button id="InsertButton" label="隔行插入" onAction="InsertRange" image="Image1"  getEnabled='GetButtonEnabled' />
 
-					<menu id="MainMenu" label="多级菜单" image="Image1">
+					<menu id="MainMenu" label="多级菜单" image="Image1" getEnabled="GetButtonEnabled">
 
 						<button id="SubMenu1" label="子菜单项1" onAction="SubMenu1Action"  getEnabled='GetButtonEnabled' />
 
@@ -29,7 +29,7 @@
 				</group>
 				<!--文件操作-->
 				<group id="WorkGroup" label="文件操作">
-					<menu id="批注" label="批注" image="Image1">
+					<menu id="批注" label="批注" image="Image1" getEnabled="GetButtonEnabled">
 						<button id="添加批注" label="添加批注" onAction="添加批注" image="Image1" screentip="添加单个批注"  getEnabled='GetButtonEnabled' />
 						<button id="删除批注" label="删除批注" onAction="删除批注"  image="Image1" />
 						<button id="删除所有批注" label="删除所有批注" onAction="删除所有批注" image="Image1" />
@@ -42,7 +42,7 @@
 					</menu>
 				</group>
 				<group id="条形码Group" label="条形码">
-					<menu id="条码Menu" label="条码" image="Image1">
+					<menu id="条码Menu" label="条码" image="Image1" getEnabled="GetButtonEnabled">
 						<button id="条形码" label="条形码" onAction="生成条形码" image="Image1" screentip="生成条形码" />
 						<button id="二维码" label="二维码" onAction="生成二维码"  image="Image1" screentip="生成二维码" />
 						<button id="批量生成条形码" label="批量生成条形码" onAction="批量生成条形码"  image="Image1" screentip="批量生成条形码" />
@@ -50,7 +50,8 @@
 				</group>
 				<!-- 注册-->
 				<group id="注册Group" label="注册使用" autoScale="false">
-					<button id="注册" label="注册" onAction="注册" image="Image1"  size="normal"  screentip="注册完成后可以使用所有功能" />
+					<button id="注册" label="注册" onAction="注册" image="身份证验证"  size="large"  screentip="注册完成后可以使用所有功能" />
+					<button id="取消注册" label="取消注册" onAction="取消注册" image="Image1"  size="normal"  screentip="注册完成后可以使用所有功能" />
 				</group>
 			</tab>
 		</tabs>

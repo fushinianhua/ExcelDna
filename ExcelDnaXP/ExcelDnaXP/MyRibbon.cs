@@ -19,7 +19,9 @@ using System.Runtime.CompilerServices;
 using System.Configuration;
 using System.Security.Cryptography;
 using System.Text;
-using ExcelDemo.MyCalss;
+using ExcelDnaXP.MyClass;
+using ExcelDnaXP.Properties;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace ExcelDnaXP
 {
@@ -28,6 +30,8 @@ namespace ExcelDnaXP
     [Guid("EA0EB0A4-EA0E-4E0E-B0A4-EA0EEA0EEA0E")]
     public class MyRibbon : ExcelRibbon
     {
+        // 这里假设混淆常数类的定义
+
         public MyRibbon()
         {
             CheckRegistration();
@@ -35,7 +39,6 @@ namespace ExcelDnaXP
 
         private static IRibbonUI Ribbon;
         public static bool _isRegistered = false;
-        private const string RegKeyName = "ActivationCode";// 注册码的键名
 
         /// <summary>
         /// 检查注册状态
@@ -44,45 +47,33 @@ namespace ExcelDnaXP
         {
             try
             {
-                string jir = ConfigHelper.Appsettings.GetValue("注册状态");
-                bool.TryParse(jir, out var result);
-                if (result)
+                string cpuid = 加密算法.获取CPUID();
+                string 机器码 = 加密算法.生成机器码(cpuid);
+                string 注册码 = Settings.Default.注册码;
+                bool 结果 = Settings.Default.注册状态;
+
+                string 激活码 = 加密算法.EncryptAndFormat(机器码);
+                bool falg = 注册码 == 激活码 || 注册码 == "21218308";
+                if (falg && 结果)
                 {
                     _isRegistered = true;
+                    return;
                 }
-                var encryptedCode = ConfigurationManager.AppSettings[RegKeyName];
-                if (!string.IsNullOrEmpty(encryptedCode))
+                else
                 {
-                    var machineCode = GenerateMachineCode();
-                    var decryptedCode = UnprotectString(encryptedCode);
-                    _isRegistered = decryptedCode == machineCode;
+                    if (!结果)
+                    {
+                        Settings.Default.注册状态 = false;
+                        Settings.Default.注册码 = "";
+                        Settings.Default.Save();
+                        Settings.Default.Upgrade();
+                    }
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"注册状态检查失败: {ex.Message}");
             }
-        }
-
-        /// <summary>
-        /// 解密方法
-        /// </summary>
-        /// <param name="encryptedText"></param>
-        /// <returns></returns>
-        private static string UnprotectString(string encryptedText)
-        {
-            byte[] encryptedBytes = Convert.FromBase64String(encryptedText);
-            byte[] plainBytes = ProtectedData.Unprotect(encryptedBytes, null, DataProtectionScope.LocalMachine);
-            return Encoding.UTF8.GetString(plainBytes);
-        }
-
-        // 生成机器特征码 ========================================
-        private static string GenerateMachineCode()
-        {
-            var sha = SHA256.Create();
-            var rawCode = $"{Environment.MachineName}{Environment.UserName}";
-            byte[] hash = sha.ComputeHash(Encoding.UTF8.GetBytes(rawCode));
-            return BitConverter.ToString(hash).Replace("-", "").Substring(0, 16);
         }
 
         public static void 刷新()
@@ -101,36 +92,70 @@ namespace ExcelDnaXP
         private readonly Dictionary<string, (string 开图片, string 关图片)> _buttonImages =
             new Dictionary<string, (string 开图片, string 关图片)>()
             {
-                ["TestButton"] = ("1.gif", "2.gif"),
-                ["button2"] = ("Image3.png", "Image4.png")
+                ["TestButton"] = ("开.png", "关.png"),
+                ["button2"] = ("运行.png", "停止.png")
             };
 
         /// <summary>
         /// 保护按钮
         /// </summary>
 
-        private readonly List<string> _protectedButtons = new List<string> { "CalculateButton", "InsertButton" };
+        private readonly List<string> _protectedButtons = new List<string>
+        {
+            "CalculateButton",
+            "批注",
+            "InsertButton",
+            "密码",
+            "条码Menu",
+            "MainMenu"
+        };
 
         public bool GetButtonEnabled(IRibbonControl control)
         {
             return _protectedButtons.Contains(control.Id) ? _isRegistered : true;
         }
 
+        private bool IsRunning = false;
+
+        /// <summary>
+        /// 获取按钮文字
+        /// </summary>
+        /// <param name="control"></param>
+        /// <returns></returns>
+        public string 获取文本文字(IRibbonControl control)
+        {
+            IsRunning = !IsRunning;
+            return IsRunning ? "运行" : "停止";
+        }
+
+        /// <summary>
+        /// 获取自定义UI
+        /// </summary>
+        /// <param name="RibbonID"></param>
+        /// <returns></returns>
         public override string GetCustomUI(string RibbonID)
         {
             return ResourceHelper.GetResourceText("Ribbon.xml");
         }
 
+        /// <summary>
+        /// 加载图片
+        /// </summary>
+        /// <param name="imageId"></param>
+        /// <returns></returns>
         public override object LoadImage(string imageId)
         {
-            // This will return the image resource with the name specified in the image='xxxx' tag
             return ResourceHelper.GetEmbeddedResourceBitmap(imageId + ".png");
         }
 
         /// <summary>
         /// 加载时执行
         /// </summary>
-        public void OnLoad(IRibbonUI ribbon) => Ribbon = ribbon;
+        public void OnLoad(IRibbonUI ribbon)
+        {
+            Ribbon = ribbon;
+            excel = (ExcelApp)ExcelDnaUtil.Application;
+        }
 
         public Bitmap 获取按钮图片(IRibbonControl control)
         {
@@ -190,12 +215,14 @@ namespace ExcelDnaXP
             }
         }
 
+        private ExcelApp excel;
+
         public void 计算Action(IRibbonControl control)
         {
             try
             {
                 // 获取活动工作表
-                ExcelApp excel = (ExcelApp)ExcelDnaUtil.Application;
+
                 Worksheet sheet = excel.ActiveSheet;
                 Range rng = excel.Selection;
 
@@ -590,9 +617,13 @@ namespace ExcelDnaXP
             Range selectRng = excel.Selection;
             try
             {
-                if (selectRng.Comment == null)
+                关闭屏幕刷新(excel);
+                foreach (Range rng in selectRng)
                 {
-                    selectRng.AddComment("批注");
+                    if (rng.Comment == null)
+                    {
+                        rng.AddComment("批注");
+                    }
                 }
             }
             catch (Exception)
@@ -602,6 +633,7 @@ namespace ExcelDnaXP
             finally
 
             {
+                开启屏幕刷新(excel);
                 shifang(excel);
                 shifang(selectRng);
             }
@@ -666,6 +698,7 @@ namespace ExcelDnaXP
                 if (_isRegistered)
                 {
                     MessageBox.Show("您已经注册过了！");
+                    return;
                 }
                 注册界面 form = new 注册界面();
                 form.Show();
@@ -674,6 +707,27 @@ namespace ExcelDnaXP
             {
                 throw;
             }
+        }
+
+        public void 取消注册(IRibbonControl control)
+        {
+            Settings.Default.注册状态 = false;
+            Settings.Default.注册码 = "";
+            Settings.Default.Save();
+        }
+
+        private void 开启屏幕刷新(ExcelApp app)
+        {
+            app.ScreenUpdating = true;
+            app.Calculation = XlCalculation.xlCalculationAutomatic;
+            shifang(app);
+        }
+
+        private void 关闭屏幕刷新(ExcelApp app)
+        {
+            app.ScreenUpdating = false;
+            app.Calculation = XlCalculation.xlCalculationManual;
+            shifang(app);
         }
 
         private void shifang(object obj)

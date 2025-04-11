@@ -44,6 +44,7 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Management" />
     <Reference Include="System.Security" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
@@ -63,7 +64,6 @@
     <Compile Include="MyClass\ClassRemoveSheetPassword.cs" />
     <Compile Include="MyClass\ClassRemoveVbaPasswordBy32.cs" />
     <Compile Include="MyClass\ClassRemoveVbaPasswordBy64.cs" />
-    <Compile Include="MyClass\ConfigHelper.cs" />
     <Compile Include="MyClass\加密算法.cs" />
     <Compile Include="MyClass\公用.cs" />
     <Compile Include="Myform\名字输入.cs">
@@ -93,6 +93,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="Settings.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Myform\名字输入.resx">
@@ -112,124 +118,28 @@
     <EmbeddedResource Include="MyRibbon\Ribbon.xml" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config">
+    <None Include="app.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="ExcelDnaXP-AddIn.dna" />
     <None Include="packages.config" />
     <None Include="Properties\ExcelDna.Build.props" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="RibbonResources\聚光灯关.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="RibbonResources\1.gif" />
-    <EmbeddedResource Include="RibbonResources\2.gif" />
-    <Content Include="RibbonResources\3.gif" />
-    <Content Include="RibbonResources\4.gif" />
-    <Content Include="RibbonResources\5.gif" />
-    <Content Include="RibbonResources\6.gif" />
-    <Content Include="RibbonResources\7.gif" />
-    <Content Include="RibbonResources\8.gif" />
-    <Content Include="RibbonResources\OCR识别.png" />
-    <Content Include="RibbonResources\QQ收款码.jpg" />
-    <Content Include="RibbonResources\set1.jpg" />
-    <Content Include="RibbonResources\set10.jpg" />
-    <Content Include="RibbonResources\set11.jpg" />
-    <Content Include="RibbonResources\set12.jpg" />
-    <Content Include="RibbonResources\set13.jpg" />
-    <Content Include="RibbonResources\set14.jpg" />
-    <Content Include="RibbonResources\set15.jpg" />
-    <Content Include="RibbonResources\set2.jpg" />
-    <Content Include="RibbonResources\set3.jpg" />
-    <Content Include="RibbonResources\set4.jpg" />
-    <Content Include="RibbonResources\set5.jpg" />
-    <Content Include="RibbonResources\set6.jpg" />
-    <Content Include="RibbonResources\set7.jpg" />
-    <Content Include="RibbonResources\set8.jpg" />
-    <Content Include="RibbonResources\set9.jpg" />
-    <Content Include="RibbonResources\WIFI.png" />
-    <Content Include="RibbonResources\x县.png" />
-    <Content Include="RibbonResources\x国家.png" />
-    <Content Include="RibbonResources\x市区.png" />
-    <Content Include="RibbonResources\x省份.png" />
-    <Content Include="RibbonResources\上下反转.png" />
-    <Content Include="RibbonResources\书生.png" />
-    <Content Include="RibbonResources\二码.png" />
-    <Content Include="RibbonResources\二维码.png" />
-    <Content Include="RibbonResources\仅粘贴公式.png" />
-    <Content Include="RibbonResources\仅粘贴格式.png" />
-    <Content Include="RibbonResources\公司.txt" />
-    <Content Include="RibbonResources\删除.png" />
-    <Content Include="RibbonResources\动态菜单.png" />
-    <Content Include="RibbonResources\历史天气.png" />
-    <Content Include="RibbonResources\去公式.png" />
-    <Content Include="RibbonResources\号码归属地.png" />
-    <Content Include="RibbonResources\合并.png" />
-    <Content Include="RibbonResources\合并单元格.png" />
-    <Content Include="RibbonResources\四则.png" />
-    <Content Include="RibbonResources\四大名著.txt" />
-    <Content Include="RibbonResources\图标.ico" />
-    <Content Include="RibbonResources\图片.png" />
-    <Content Include="RibbonResources\外国.txt" />
-    <Content Include="RibbonResources\多表合并.png" />
+    <EmbeddedResource Include="RibbonResources\停止.png" />
+    <EmbeddedResource Include="RibbonResources\运行.png" />
+    <EmbeddedResource Include="RibbonResources\填充选择.png" />
+    <EmbeddedResource Include="RibbonResources\关.png" />
     <Content Include="RibbonResources\大写.png" />
-    <Content Include="RibbonResources\姓名.png" />
-    <Content Include="RibbonResources\学历.png" />
-    <Content Include="RibbonResources\导出.png" />
-    <Content Include="RibbonResources\小写.png" />
-    <Content Include="RibbonResources\工资条.png" />
-    <Content Include="RibbonResources\左右反转.png" />
-    <Content Include="RibbonResources\微信收款码.jpg" />
-    <Content Include="RibbonResources\感叹号.png" />
-    <Content Include="RibbonResources\截图.png" />
-    <Content Include="RibbonResources\执行.png" />
-    <Content Include="RibbonResources\拆分.png" />
-    <Content Include="RibbonResources\拆分并填充.png" />
-    <Content Include="RibbonResources\拆工作表.png" />
+    <EmbeddedResource Include="RibbonResources\开.png" />
     <Content Include="RibbonResources\拼音.png" />
-    <Content Include="RibbonResources\排列组合.png" />
-    <Content Include="RibbonResources\提取.png" />
-    <Content Include="RibbonResources\提取字母.png" />
-    <Content Include="RibbonResources\提取数字.png" />
-    <Content Include="RibbonResources\提取文本.png" />
-    <Content Include="RibbonResources\插删.png" />
-    <Content Include="RibbonResources\支付宝收款码.jpg" />
-    <Content Include="RibbonResources\文件目录.png" />
-    <Content Include="RibbonResources\文件目录重命名.png" />
-    <Content Include="RibbonResources\斜十字.png" />
-    <Content Include="RibbonResources\日期.png" />
-    <Content Include="RibbonResources\显示窗格.png" />
-    <Content Include="RibbonResources\有道翻译.png" />
-    <Content Include="RibbonResources\正则.png" />
-    <Content Include="RibbonResources\清除干扰码.png" />
-    <Content Include="RibbonResources\甘特图.png" />
-    <Content Include="RibbonResources\用户注册.png" />
+    <Content Include="RibbonResources\插入行.png" />
     <Content Include="RibbonResources\电话.png" />
-    <Content Include="RibbonResources\百内数字.png" />
-    <Content Include="RibbonResources\目录.png" />
-    <Content Include="RibbonResources\破解.png" />
-    <Content Include="RibbonResources\窗格.png" />
-    <Content Include="RibbonResources\筛选粘贴.png" />
-    <Content Include="RibbonResources\粘贴为数值.png" />
-    <Content Include="RibbonResources\粘贴单元格.png" />
-    <Content Include="RibbonResources\组合.png" />
-    <Content Include="RibbonResources\联网.txt" />
-    <Content Include="RibbonResources\聚光灯开.png" />
-    <Content Include="RibbonResources\菜单.png" />
-    <Content Include="RibbonResources\说明.png" />
-    <Content Include="RibbonResources\资助.png" />
-    <Content Include="RibbonResources\身份.txt" />
-    <Content Include="RibbonResources\身份证.png" />
-    <Content Include="RibbonResources\身份证验证.png" />
-    <Content Include="RibbonResources\逆透视.png" />
-    <Content Include="RibbonResources\选区公式.png" />
-    <Content Include="RibbonResources\选区反转.png" />
-    <Content Include="RibbonResources\部门.png" />
-    <Content Include="RibbonResources\重命名.png" />
-    <Content Include="RibbonResources\随机.png" />
-    <Content Include="RibbonResources\随机不重复.png" />
-    <Content Include="RibbonResources\随机表.png" />
+    <EmbeddedResource Include="RibbonResources\身份证验证.png" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
