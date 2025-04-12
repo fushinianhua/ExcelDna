@@ -1,18 +1,11 @@
-﻿using ExcelDna.Integration;
-
-namespace xpzy
+﻿namespace xpzy
 {
     public static class MyFunctions
     {
-        [ExcelFunction(Description = "My first .NET function")]
+        // [ExcelFunction(Description = "返回包含问候语和传入姓名的字符串")]
         public static string SayHello(string name)
         {
             return "Hello " + name;
-        }
-
-        public static string love(string password)
-        {
-            return "yq";
         }
     }
 }

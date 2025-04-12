@@ -2,7 +2,7 @@
 using System.IO;
 using System.Drawing;
 
-namespace ExcelDnaTest
+namespace Radiant
 {
     internal class ResourceHelper
     {

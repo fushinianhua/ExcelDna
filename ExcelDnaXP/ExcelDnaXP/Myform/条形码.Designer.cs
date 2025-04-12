@@ -1,4 +1,4 @@
-﻿namespace ExcelDnaXP.Myform
+﻿namespace Radiant.Myform
 {
     partial class 条形码
     {
@@ -129,13 +129,14 @@
             // 
             // label3
             // 
-            this.label3.Font = new System.Drawing.Font("宋体", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label3.Location = new System.Drawing.Point(354, 364);
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("宋体", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label3.Location = new System.Drawing.Point(356, 372);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(175, 26);
+            this.label3.Size = new System.Drawing.Size(135, 15);
             this.label3.TabIndex = 22;
             this.label3.Text = "当前显示生成位置:";
-            this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.label3.Visible = false;
             // 
             // 条形码
             // 

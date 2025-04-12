@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ZXing;
 
-namespace ExcelDnaXP.MyCalss
+namespace Radiant.MyCalss
 {
     public class 公用
     {

@@ -6,24 +6,15 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using ExcelDna.Integration;
 using ExcelDna.Integration.CustomUI;
-using ExcelDnaTest;
 using ExcelDnaXP.Myform;
 using Microsoft.Office.Interop.Excel;
-
-using Excel = Microsoft.Office.Interop.Excel;
-
 using ExcelApp = Microsoft.Office.Interop.Excel.Application;
-using ExcelDnaXP.MyCalss;
 using System.IO;
-using System.Runtime.CompilerServices;
-using System.Configuration;
-using System.Security.Cryptography;
-using System.Text;
-using ExcelDnaXP.MyClass;
-using ExcelDnaXP.Properties;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using Radiant.Properties;
+using Radiant.MyCalss;
+using Radiant.Myform;
 
-namespace ExcelDnaXP
+namespace Radiant
 {
     [ComVisible(true)]
     [ProgId("MyRibbon")]
@@ -37,49 +28,11 @@ namespace ExcelDnaXP
             CheckRegistration();
         }
 
+        #region 变量定义
+
+        private ExcelApp excel;
         private static IRibbonUI Ribbon;
         public static bool _isRegistered = false;
-
-        /// <summary>
-        /// 检查注册状态
-        /// </summary>
-        private void CheckRegistration()
-        {
-            try
-            {
-                string cpuid = 加密算法.获取CPUID();
-                string 机器码 = 加密算法.生成机器码(cpuid);
-                string 注册码 = Settings.Default.注册码;
-                bool 结果 = Settings.Default.注册状态;
-
-                string 激活码 = 加密算法.EncryptAndFormat(机器码);
-                bool falg = 注册码 == 激活码 || 注册码 == "21218308";
-                if (falg && 结果)
-                {
-                    _isRegistered = true;
-                    return;
-                }
-                else
-                {
-                    if (!结果)
-                    {
-                        Settings.Default.注册状态 = false;
-                        Settings.Default.注册码 = "";
-                        Settings.Default.Save();
-                        Settings.Default.Upgrade();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"注册状态检查失败: {ex.Message}");
-            }
-        }
-
-        public static void 刷新()
-        {
-            Ribbon.Invalidate();
-        }
 
         /// <summary>
         /// 所有按钮状态
@@ -110,6 +63,53 @@ namespace ExcelDnaXP
             "MainMenu"
         };
 
+        #endregion 变量定义
+
+        /// <summary>
+        /// 检查注册状态
+        /// </summary>
+        private void CheckRegistration()
+        {
+            try
+            {
+                string cpuid = 加密算法.获取CPUID();
+                string 机器码 = 加密算法.生成机器码(cpuid);
+                string 注册码 = Settings.Default.注册码;
+                bool 结果 = Settings.Default.注册状态;
+                string 激活码 = 加密算法.EncryptAndFormat(机器码);
+                bool falg = 注册码 == 激活码 || 注册码 == "21218308";
+                if (falg && 结果)
+                {
+                    _isRegistered = true;
+                    return;
+                }
+                else
+                {
+                    if (!结果)
+                    {
+                        Settings.Default.注册状态 = false;
+                        Settings.Default.注册码 = "";
+                        Settings.Default.Save();
+                        Settings.Default.Upgrade();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"注册状态检查失败: {ex.Message}");
+            }
+        }
+
+        public static void 刷新()
+        {
+            Ribbon.Invalidate();
+        }
+
+        /// <summary>
+        /// 获取按钮状态
+        /// </summary>
+        /// <param name="control"></param>
+        /// <returns></returns>
         public bool GetButtonEnabled(IRibbonControl control)
         {
             return _protectedButtons.Contains(control.Id) ? _isRegistered : true;
@@ -154,9 +154,14 @@ namespace ExcelDnaXP
         public void OnLoad(IRibbonUI ribbon)
         {
             Ribbon = ribbon;
-            excel = (ExcelApp)ExcelDnaUtil.Application;
+            excel = ExcelDnaUtil.Application as ExcelApp;
         }
 
+        /// <summary>
+        /// 获取按钮图片
+        /// </summary>
+        /// <param name="control"></param>
+        /// <returns></returns>
         public Bitmap 获取按钮图片(IRibbonControl control)
         {
             // 初始化默认状态
@@ -194,9 +199,7 @@ namespace ExcelDnaXP
         /// <param name="control"></param>
         public void 生成Action(IRibbonControl control)
         {
-            // 获取活动工作表
-            dynamic excel = ExcelDnaUtil.Application;
-            dynamic sheet = excel.ActiveSheet;
+            Worksheet sheet = excel.ActiveSheet;
             try
             {
                 // 向 A1 单元格写入数据
@@ -210,12 +213,9 @@ namespace ExcelDnaXP
             }
             finally
             {
-                shifang(excel);
                 shifang(sheet);
             }
         }
-
-        private ExcelApp excel;
 
         public void 计算Action(IRibbonControl control)
         {
@@ -349,26 +349,49 @@ namespace ExcelDnaXP
             MessageBox.Show("Hello!");
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="control"></param>
         public void InsertRange(IRibbonControl control)
         {
+            Worksheet sheet = excel.ActiveSheet;
+            Range selectRng = excel.Selection;
             try
             {
-                ExcelApp excel = (ExcelApp)ExcelDnaUtil.Application;
-                Worksheet sheet = excel.ActiveSheet;
-                Range selectRng = excel.Selection;
-                int lastRow = selectRng.Row + selectRng.Rows.Count;
+                int count = selectRng.Rows.Count;
+                if (count == 1)
+                {
+                    selectRng.Insert(XlInsertShiftDirection.xlShiftDown);
+                    return;
+                }
+                int lastRow = selectRng.Row + count;
                 int startRow = selectRng.Row;
-                for (int i = lastRow; i >= startRow; i -= 1)
+                for (int i = lastRow; i > startRow; i--)
                 {
                     Range newRow = sheet.Rows[i];
-                    newRow.Insert(Excel.XlInsertShiftDirection.xlShiftDown);
+                    newRow.Insert(XlInsertShiftDirection.xlShiftDown);
                 }
             }
             catch (Exception ex)
             {
-                // 可以根据实际情况添加日志记录
-                Console.WriteLine($"发生异常: {ex.Message}");
+                MessageBox.Show(ex.Message);
             }
+            finally
+            {
+                shifang(sheet);
+                shifang(selectRng);
+            }
+        }
+
+        /// <summary>
+        /// 删除行
+        /// </summary>
+        /// <param name="control"></param>
+        public void DeleRange(IRibbonControl control)
+        {
+            Worksheet sheet = excel.ActiveSheet;
+            Range selectRng = excel.Selection;
         }
 
         /// <summary>
@@ -379,7 +402,6 @@ namespace ExcelDnaXP
         {
             try
             {
-                ExcelApp excel = (ExcelApp)ExcelDnaUtil.Application;
                 string prdcode = excel.ProductCode;
                 string[] pds = prdcode.Split('-');
                 if (pds.Length > 4)
@@ -402,109 +424,11 @@ namespace ExcelDnaXP
             }
         }
 
-        public void 破解excel文件(IRibbonControl control)
-        {
-            try
-            {
-                // 创建文件选择对话框
-                OpenFileDialog openFileDialog = new OpenFileDialog();
-                openFileDialog.Filter = "Excel Files|*.xls;*.xlsx;*.xlsm";
-                openFileDialog.Title = "Select an Excel Workbook";
-
-                if (openFileDialog.ShowDialog() == DialogResult.OK)
-                {
-                    string filePath = openFileDialog.FileName;
-                    Task.Run(() => { CrackWorkbookPassword(filePath); });
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error: {ex.Message}");
-            }
-        }
-
-        private static void CrackWorkbookPassword(string filePath)
-        {
-            try
-            {
-                // 获取Excel应用程序对象
-                ExcelApp excel = (ExcelApp)ExcelDnaUtil.Application;
-
-                // 更全面的字符集，包含常见ASCII可打印字符和常见中文字符
-                string charset = "";
-                // 添加常见ASCII可打印字符
-                for (int i = 32; i <= 126; i++)
-                {
-                    charset += (char)i;
-                }
-                // 添加常见中文字符，这里使用了汉字的Unicode范围
-                for (int i = 0x4E00; i <= 0x9FA5; i++)
-                {
-                    charset += (char)i;
-                }
-                int maxLength = 20; // 最大密码长度，可根据实际情况调整
-
-                // 生成密码并尝试破解
-                for (int length = 1; length <= maxLength; length++)
-                {
-                    string[] passwords = GeneratePasswords(charset, length);
-                    foreach (string password in passwords)
-                    {
-                        try
-                        {
-                            Workbook workbook = excel.Workbooks.Open(filePath, Password: password);
-                            if (workbook != null)
-                            {
-                                // 密码正确
-                                MessageBox.Show($"Password cracked: {password}");
-                                workbook.Close(false);
-                                return;
-                            }
-                        }
-                        catch (COMException comEx)
-                        {
-                            // 记录密码错误尝试日志
-                            LogError(comEx, $"尝试密码 {password} 失败。");
-                            // 密码错误，继续尝试
-                        }
-                    }
-                }
-                MessageBox.Show("Password not found.");
-            }
-            catch (Exception ex)
-            {
-                LogError(ex);
-                MessageBox.Show($"Error: {ex.Message}");
-            }
-        }
-
-        private static string[] GeneratePasswords(string charset, int length)
-        {
-            if (length == 1)
-            {
-                string[] result = new string[charset.Length];
-                for (int i = 0; i < charset.Length; i++)
-                {
-                    result[i] = charset[i].ToString();
-                }
-                return result;
-            }
-            else
-            {
-                string[] prevPasswords = GeneratePasswords(charset, length - 1);
-                string[] newPasswords = new string[prevPasswords.Length * charset.Length];
-                int index = 0;
-                foreach (string prevPassword in prevPasswords)
-                {
-                    for (int i = 0; i < charset.Length; i++)
-                    {
-                        newPasswords[index++] = prevPassword + charset[i];
-                    }
-                }
-                return newPasswords;
-            }
-        }
-
+        /// <summary>
+        /// 记录错误信息
+        /// </summary>
+        /// <param name="ex"></param>
+        /// <param name="additionalMessage"></param>
         private static void LogError(Exception ex, string additionalMessage = "")
         {
             try
@@ -536,7 +460,6 @@ namespace ExcelDnaXP
         {
             try
             {
-                ExcelApp excel = (ExcelApp)ExcelDnaUtil.Application;
                 ClassRemoveSheetPassword sheetClass = new ClassRemoveSheetPassword(excel);
                 sheetClass.UnprotectWorkBookPassword();
             }
@@ -554,7 +477,6 @@ namespace ExcelDnaXP
         {
             try
             {
-                ExcelApp excel = (ExcelApp)ExcelDnaUtil.Application;
                 ClassRemoveSheetPassword sheetClass = new ClassRemoveSheetPassword(excel);
                 sheetClass.UnprotectSheetPassword();
             }
@@ -568,7 +490,6 @@ namespace ExcelDnaXP
         {
             try
             {
-                ExcelApp excel = (ExcelApp)ExcelDnaUtil.Application;
                 条形码 form = new 条形码(
                    公用.BarType.CODE_128, excel);
                 form.Show();
@@ -583,7 +504,6 @@ namespace ExcelDnaXP
         {
             try
             {
-                ExcelApp excel = (ExcelApp)ExcelDnaUtil.Application;
                 条形码 form = new 条形码(
                   公用.BarType.QR_CODE, excel);
 
@@ -599,7 +519,6 @@ namespace ExcelDnaXP
         {
             try
             {
-                ExcelApp excel = (ExcelApp)ExcelDnaUtil.Application;
                 条形码 form = new 条形码(
                   公用.BarType.CODE_128, excel, true);
 
@@ -613,7 +532,6 @@ namespace ExcelDnaXP
 
         public void 添加批注(IRibbonControl control)
         {
-            ExcelApp excel = (ExcelApp)ExcelDnaUtil.Application;
             Range selectRng = excel.Selection;
             try
             {
@@ -634,14 +552,12 @@ namespace ExcelDnaXP
 
             {
                 开启屏幕刷新(excel);
-                shifang(excel);
                 shifang(selectRng);
             }
         }
 
         public void 删除批注(IRibbonControl control)
         {
-            ExcelApp excel = (ExcelApp)ExcelDnaUtil.Application;
             Range rng = excel.Selection;
             try
             {
@@ -656,14 +572,12 @@ namespace ExcelDnaXP
             }
             finally
             {
-                shifang(excel);
                 shifang(rng);
             }
         }
 
         public void 删除所有批注(IRibbonControl control)
         {
-            ExcelApp excel = (ExcelApp)ExcelDnaUtil.Application;
             Worksheet worksheet = excel.ActiveSheet;
             Range rng = worksheet.UsedRange;
             try
@@ -685,7 +599,6 @@ namespace ExcelDnaXP
             }
             finally
             {
-                shifang(excel);
                 shifang(worksheet);
                 shifang(rng);
             }

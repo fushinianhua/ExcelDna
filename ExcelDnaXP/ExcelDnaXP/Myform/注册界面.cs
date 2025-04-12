@@ -1,5 +1,5 @@
-﻿using ExcelDnaXP.MyClass;
-using ExcelDnaXP.Properties;
+﻿using Radiant;
+using Radiant.Properties;
 using System;
 
 using System.Windows.Forms;

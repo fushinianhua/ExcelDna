@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace ExcelDnaXP.Myform
+namespace Radiant.Myform
 {
     public partial class 名字输入 : Form
     {
@@ -76,6 +76,10 @@ namespace ExcelDnaXP.Myform
             {
                 e.Cancel = true;
             }
+        }
+
+        private void 名字输入_Load_1(object sender, EventArgs e)
+        {
         }
     }
 }

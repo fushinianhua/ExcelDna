@@ -12,7 +12,7 @@
 				<!--数据的生成删除操作 -->
 				<group id="DataGruop" label="数据">
 					<button id="CalculateButton" label="名字填充" onAction="计算Action" image="填充选择" size="large" getEnabled='GetButtonEnabled' />
-					<button id="InsertButton" label="隔行插入" onAction="InsertRange" image="Image1"  getEnabled='GetButtonEnabled' />
+					<button id="InsertButton" label="隔行插入" onAction="InsertRange" image="插入行"  size="large" getEnabled='GetButtonEnabled' />
 
 					<menu id="MainMenu" label="多级菜单" image="Image1" getEnabled="GetButtonEnabled">
 
@@ -29,10 +29,13 @@
 				</group>
 				<!--文件操作-->
 				<group id="WorkGroup" label="文件操作">
+					<labelControl id="文本1" label="定位" />
+					<editBox id="文本框1" />
 					<menu id="批注" label="批注" image="Image1" getEnabled="GetButtonEnabled">
-						<button id="添加批注" label="添加批注" onAction="添加批注" image="Image1" screentip="添加单个批注"  getEnabled='GetButtonEnabled' />
-						<button id="删除批注" label="删除批注" onAction="删除批注"  image="Image1" />
-						<button id="删除所有批注" label="删除所有批注" onAction="删除所有批注" image="Image1" />
+
+						<button id="添加批注" label="添加批注" onAction="添加批注" image="添加批注" screentip="添加单个批注"  getEnabled='GetButtonEnabled' />
+						<button id="删除批注" label="删除批注" onAction="删除批注 "  image="删除批注 " />
+						<button id="删除所有批注" label="删除所有批注" onAction="删除所有批注" image="删除批注 " />
 					</menu>
 					<menu id="密码" label="密码" image="Image1" getEnabled='GetButtonEnabled'>
 						<!--<button id="破解excel文件" label="破解Excel文件" onAction="破解excel文件" image="Image1" screentip="清除文件密码" />-->
@@ -43,15 +46,18 @@
 				</group>
 				<group id="条形码Group" label="条形码">
 					<menu id="条码Menu" label="条码" image="Image1" getEnabled="GetButtonEnabled">
-						<button id="条形码" label="条形码" onAction="生成条形码" image="Image1" screentip="生成条形码" />
-						<button id="二维码" label="二维码" onAction="生成二维码"  image="Image1" screentip="生成二维码" />
-						<button id="批量生成条形码" label="批量生成条形码" onAction="批量生成条形码"  image="Image1" screentip="批量生成条形码" />
+						<button id="条形码" label="条形码" onAction="生成条形码" image="条形码" screentip="生成条形码" />
+						<button id="二维码" label="二维码" onAction="生成二维码"  image="二维码" screentip="生成二维码" />
+						<button id="批量生成条形码" label="批量生成条形码" onAction="批量生成条形码"  image="二维码" screentip="批量生成条形码" />
 					</menu>
 				</group>
 				<!-- 注册-->
 				<group id="注册Group" label="注册使用" autoScale="false">
 					<button id="注册" label="注册" onAction="注册" image="身份证验证"  size="large"  screentip="注册完成后可以使用所有功能" />
 					<button id="取消注册" label="取消注册" onAction="取消注册" image="Image1"  size="normal"  screentip="注册完成后可以使用所有功能" />
+				</group>
+				<group id="帮助Group" label="帮助">
+					<button id="帮助Button" label="关于" onAction="About" image="联系人"  size="large"  screentip="如有其他需求或者有使用中有什么问题请联系" />
 				</group>
 			</tab>
 		</tabs>

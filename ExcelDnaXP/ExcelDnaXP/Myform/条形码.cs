@@ -15,9 +15,9 @@ using ZXing.Common;
 using ExcelAPP = Microsoft.Office.Interop.Excel.Application;
 using Microsoft.Office.Interop.Excel;
 using System.Runtime.InteropServices;
-using static ExcelDnaXP.MyCalss.公用;
+using static Radiant.MyCalss.公用;
 
-namespace ExcelDnaXP.Myform
+namespace Radiant.Myform
 {
     public partial class 条形码 : Form
     {

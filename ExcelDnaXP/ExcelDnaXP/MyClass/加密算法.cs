@@ -1,4 +1,4 @@
-﻿using ExcelDnaXP.Properties;
+﻿using Radiant.Properties;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using static ExcelDna.Integration.XlCall;
 
-namespace ExcelDnaXP.MyClass
+namespace Radiant
 {
     public static class 加密算法
     {

@@ -1,4 +1,4 @@
-﻿namespace ExcelDnaXP.Myform
+﻿namespace Radiant.Myform
 {
     partial class 名字输入
     {
@@ -149,6 +149,7 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "名字输入";
             this.TopMost = true;
+            this.Load += new System.EventHandler(this.名字输入_Load_1);
             this.ResumeLayout(false);
             this.PerformLayout();
 
