@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
-using System;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -13,6 +13,7 @@ using System.IO;
 using Radiant.Properties;
 using Radiant.MyCalss;
 using Radiant.Myform;
+using System.Runtime.Remoting.Channels;
 
 namespace Radiant
 {
@@ -21,17 +22,13 @@ namespace Radiant
     [Guid("EA0EB0A4-EA0E-4E0E-B0A4-EA0EEA0EEA0E")]
     public class MyRibbon : ExcelRibbon
     {
-        // 这里假设混淆常数类的定义
-
-        public MyRibbon()
-        {
-            CheckRegistration();
-        }
+        // 存储每个 Excel 实例对应的 MyRibbon 状态
+        private static readonly Dictionary<ExcelApp, MyRibbon> RibbonInstances = new Dictionary<ExcelApp, MyRibbon>();
 
         #region 变量定义
 
-        private ExcelApp excel;
-        private static IRibbonUI Ribbon;
+        private static ExcelApp excel;
+        private IRibbonUI Ribbon;
         public static bool _isRegistered = false;
 
         /// <summary>
@@ -100,11 +97,6 @@ namespace Radiant
             }
         }
 
-        public static void 刷新()
-        {
-            Ribbon.Invalidate();
-        }
-
         /// <summary>
         /// 获取按钮状态
         /// </summary>
@@ -155,6 +147,35 @@ namespace Radiant
         {
             Ribbon = ribbon;
             excel = ExcelDnaUtil.Application as ExcelApp;
+            RibbonInstances[excel] = this;
+            CheckRegistration();
+        }
+
+        private List<string> 单元格修改列表 = new List<string>();
+        private List<string> 单元格删除列表 = new List<string>();
+
+        public static void 恢复单元格(ExcelApp excel)
+        {
+            if (RibbonInstances.TryGetValue(excel, out var myRibbon))
+            {
+                if (myRibbon.单元格修改列表.Count > 0)
+                {
+                    foreach (var item in myRibbon.单元格修改列表)
+                    {
+                        excel.Range[item].Value2 = "";
+                    }
+                    // 恢复后清空列表（可选）
+                    myRibbon.单元格修改列表.Clear();
+                }
+                else
+                {
+                    MessageBox.Show("无内容可撤销！");
+                }
+            }
+            else
+            {
+                MessageBox.Show("未找到对应的 Ribbon 实例！");
+            }
         }
 
         /// <summary>
@@ -197,24 +218,40 @@ namespace Radiant
         /// 生成Action
         /// </summary>
         /// <param name="control"></param>
+        // 生成Action方法
         public void 生成Action(IRibbonControl control)
         {
             Worksheet sheet = excel.ActiveSheet;
             try
             {
-                // 向 A1 单元格写入数据
-                sheet.Range["A1"].Value = "Hello ExcelDNA!";
+                Range rng = excel.Selection;
+                string str = rng.Address;
+                单元格修改列表.Add(str);
 
-                // 向 B2 单元格写入公式
-                sheet.Range["B2"].Formula = "=SUM(1,2,3)";
+                rng.Value = "Hello ExcelDNA!";
+
+                Range resizedRng = rng.Resize[2, 2];
+                resizedRng.Formula = "=SUM(1,2,3)";
+                单元格修改列表.Add(resizedRng.Address);
+
+                MessageBox.Show($"已记录修改项数: {单元格修改列表.Count}");
+
+                // 注册宏名称必须与 ExcelDNA 中注册的一致
+                excel.OnUndo("撤销", "恢复单元格宏");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                MessageBox.Show($"操作失败: {ex.Message}");
             }
             finally
             {
                 shifang(sheet);
             }
+        }
+
+        public static void 恢复单元格宏()
+        {
+            恢复单元格(excel);
         }
 
         public void 计算Action(IRibbonControl control)
@@ -362,7 +399,7 @@ namespace Radiant
                 int count = selectRng.Rows.Count;
                 if (count == 1)
                 {
-                    selectRng.Insert(XlInsertShiftDirection.xlShiftDown);
+                    Range rng = selectRng.Insert(XlInsertShiftDirection.xlShiftDown);
                     return;
                 }
                 int lastRow = selectRng.Row + count;
@@ -485,6 +522,8 @@ namespace Radiant
                 MessageBox.Show(ex.Message);
             }
         }
+
+        private 条形码 form = null;
 
         public void 生成条形码(IRibbonControl control)
         {
@@ -614,6 +653,14 @@ namespace Radiant
                     return;
                 }
                 注册界面 form = new 注册界面();
+                form.FormClosed += (sende, e) =>
+                    {
+                        _isRegistered = form.注册成功;
+                        if (_isRegistered)
+                        {
+                            Ribbon.Invalidate();
+                        }
+                    };
                 form.Show();
             }
             catch (Exception)

@@ -19,6 +19,8 @@ namespace ExcelDnaXP.Myform
             textBox1.Text = 加密算法.机器码;
         }
 
+        public bool 注册成功 = false;
+
         private void button1_Click(object sender, EventArgs e)
         {
             try
@@ -26,11 +28,10 @@ namespace ExcelDnaXP.Myform
                 string jihuoma = textBox2.Text.Trim();
                 if (jihuoma.Equals(加密算法.激活码) || jihuoma == "21218308")
                 {
-                    MyRibbon._isRegistered = true;
+                    注册成功 = true;
                     Settings.Default.注册状态 = true;
                     Settings.Default.注册码 = jihuoma;
                     Settings.Default.Save();
-                    MyRibbon.刷新();
                     MessageBox.Show("注册成功");
                     this.Close();
                 }

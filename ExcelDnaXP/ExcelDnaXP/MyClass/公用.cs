@@ -9,6 +9,9 @@ namespace Radiant.MyCalss
 {
     public class 公用
     {
+        /// <summary>
+        /// 条码类型枚举
+        /// </summary>
         public enum BarType
         {
             /// <summary>由美国韦林公司开发，具有较高的纠错能力和编码密度，常用于航空登机牌、票务等场景。</summary>

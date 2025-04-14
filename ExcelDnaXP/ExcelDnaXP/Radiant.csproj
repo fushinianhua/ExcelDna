@@ -34,6 +34,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="ExcelDna.Integration, Version=1.1.0.0, Culture=neutral, PublicKeyToken=f225e9659857edbe, processorArchitecture=MSIL">
       <HintPath>..\packages\ExcelDna.Integration.1.1.0\lib\ExcelDna.Integration.dll</HintPath>
@@ -138,6 +141,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="RibbonResources\测试.png" />
     <EmbeddedResource Include="RibbonResources\联系人.png" />
     <EmbeddedResource Include="RibbonResources\停止.png" />
     <EmbeddedResource Include="RibbonResources\运行.png" />
@@ -145,14 +149,17 @@
     <EmbeddedResource Include="RibbonResources\关.png" />
     <EmbeddedResource Include="RibbonResources\二维码.png" />
     <EmbeddedResource Include="RibbonResources\删除批注 .png" />
+    <EmbeddedResource Include="RibbonResources\破解密码.png" />
     <Content Include="RibbonResources\大写.png" />
     <EmbeddedResource Include="RibbonResources\开.png" />
     <EmbeddedResource Include="RibbonResources\添加批注.png" />
+    <EmbeddedResource Include="RibbonResources\取消注册.png" />
     <Content Include="RibbonResources\拼音.png" />
     <EmbeddedResource Include="RibbonResources\插入行.png" />
     <EmbeddedResource Include="RibbonResources\条形码.png" />
+    <EmbeddedResource Include="RibbonResources\插入图片.png" />
     <Content Include="RibbonResources\电话.png" />
-    <EmbeddedResource Include="RibbonResources\身份证验证.png" />
+    <EmbeddedResource Include="RibbonResources\注册.png" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

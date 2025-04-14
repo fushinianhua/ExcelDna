@@ -29,32 +29,38 @@ namespace Radiant.Myform
         // 第二个构造函数
         public 条形码(BarType bar, ExcelAPP excelAPP, bool b = false)
         {
-            // 检查 excelAPP 是否为 null，如果为 null 则抛出异常
-            if (excelAPP == null)
+            try
             {
-                throw new ArgumentNullException(nameof(excelAPP), "传入的 ExcelAPP 实例不能为 null");
-            }
-            app = excelAPP;
-            Workbook activeWorkbook = app.ActiveWorkbook;
-            if (activeWorkbook != null)
-            {
-                sheetActivateHandler = new WorkbookEvents_SheetActivateEventHandler(Wb_SheetActivate);
-                activeWorkbook.SheetActivate += sheetActivateHandler;
-            }
-            // 这里使用 null 条件运算符检查 app 是否为 null
-            Worksheet worksheet = app?.ActiveSheet as Worksheet;
-            if (worksheet != null)
-            {
-                worksheet.SelectionChange += 事件改变;
-                this.FontChanged += (sende, e) =>
+                if (excelAPP == null)
                 {
-                    worksheet.SelectionChange -= 事件改变;
-                };
-            }
+                    throw new ArgumentNullException(nameof(excelAPP), "传入的 ExcelAPP 实例不能为 null");
+                }
+                app = excelAPP;
+                Workbook activeWorkbook = app.ActiveWorkbook;
+                if (activeWorkbook != null)
+                {
+                    sheetActivateHandler = new WorkbookEvents_SheetActivateEventHandler(Wb_SheetActivate);
+                    activeWorkbook.SheetActivate += sheetActivateHandler;
+                }
+                // 这里使用 null 条件运算符检查 app 是否为 null
+                Worksheet worksheet = app?.ActiveSheet as Worksheet;
+                if (worksheet != null)
+                {
+                    worksheet.SelectionChange += 事件改变;
+                    this.FontChanged += (sende, e) =>
+                    {
+                        worksheet.SelectionChange -= 事件改变;
+                    };
+                }
 
-            bartype = bar;
-            IsPiliang = b;
-            InitializeComponent();
+                bartype = bar;
+                IsPiliang = b;
+                InitializeComponent();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         private void Wb_SheetActivate(object Sh)
@@ -100,14 +106,14 @@ namespace Radiant.Myform
                     this.Name = "条形码";
                     label1.Text = "条形码" + "文本";
                     pictureBox1.Location = new System.Drawing.Point(50, 150);
-                    pictureBox1.Size = new System.Drawing.Size(400, 100);
+                    pictureBox1.Size = new Size(400, 100);
                 }
                 else
                 {
                     this.Name = "生成码";
                     label1.Text = "生成码" + "文本";
                     pictureBox1.Location = new System.Drawing.Point(50, 150);
-                    pictureBox1.Size = new System.Drawing.Size(400, 100);
+                    pictureBox1.Size = new Size(400, 100);
                 }
                 if (IsPiliang)
                 {
@@ -161,7 +167,6 @@ namespace Radiant.Myform
             }
             catch (Exception)
             {
-                throw;
             }
         }
 
