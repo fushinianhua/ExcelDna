@@ -13,6 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Application = Microsoft.Office.Interop.Excel.Application;
+using Button = System.Windows.Forms.Button;
 using Rectangle = System.Drawing.Rectangle;
 
 namespace Radiant.MyForm
@@ -248,7 +249,6 @@ namespace Radiant.MyForm
             try
             {
                 ShowWaitCursor();
-                EnableControls(false);
 
                 // 清空之前的结果
                 相同Rng.Clear();
@@ -257,7 +257,6 @@ namespace Radiant.MyForm
                 if (string.IsNullOrEmpty(区域1Box.Text) || string.IsNullOrEmpty(区域2Box.Text))
                 {
                     MessageBox.Show("请先选择两个对比区域", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    EnableControls(true);
                     HideWaitCursor();
                     return;
                 }
@@ -269,7 +268,6 @@ namespace Radiant.MyForm
                 if (data1 == null || data2 == null)
                 {
                     MessageBox.Show("无法获取数据，请确保选择了有效区域", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    EnableControls(true);
                     HideWaitCursor();
                     return;
                 }
@@ -309,7 +307,6 @@ namespace Radiant.MyForm
             }
             finally
             {
-                EnableControls(true);
                 HideWaitCursor();
             }
         }
@@ -423,16 +420,14 @@ namespace Radiant.MyForm
             区域二Text.Text = string.Join(Environment.NewLine, uniqueKeys2);
             相同项Text.Text = string.Join(Environment.NewLine, commonKeys);
 
-            // 更新按钮状态
-            bool hasCommonItems = commonKeys.Count > 0;
-            bool hasDifferentItems = uniqueKeys1.Count > 0 || uniqueKeys2.Count > 0;
-            bool hasMarkedItems = 相同Rng.Count > 0 || 不同Rng.Count > 0;
+            // 更新按钮状态 - 恢复原始逻辑
+            不同项.Enabled = 导出不同项.Enabled = uniqueKeys1.Count > 0 || uniqueKeys2.Count > 0;
+            相同项.Enabled = 导出相同项.Enabled = commonKeys.Count > 0;
+            清除标识.Enabled = 相同Rng.Count > 0 || 不同Rng.Count > 0;
 
-            相同项.Enabled = hasCommonItems;
-            导出相同项.Enabled = hasCommonItems;
-            不同项.Enabled = hasDifferentItems;
-            导出不同项.Enabled = hasDifferentItems;
-            清除标识.Enabled = hasMarkedItems;
+            Debug.WriteLine($"相同项数量: {commonKeys.Count}");
+            Debug.WriteLine($"区域一独有: {uniqueKeys1.Count}");
+            Debug.WriteLine($"区域二独有: {uniqueKeys2.Count}");
         }
 
         /// <summary>
@@ -440,35 +435,15 @@ namespace Radiant.MyForm
         /// </summary>
         private void 相同项_Click(object sender, EventArgs e)
         {
-            ProcessMarking(相同Rng, "标记相同项");
-        }
-
-        /// <summary>
-        /// 标记不同项按钮点击事件
-        /// </summary>
-        private void 不同项_Click(object sender, EventArgs e)
-        {
-            ProcessMarking(不同Rng, "标记不同项");
-        }
-
-        /// <summary>
-        /// 处理标记操作的公共方法
-        /// </summary>
-        private void ProcessMarking(List<Range> ranges, string operationName)
-        {
             try
             {
-                if (!selectColor.HasValue || ranges.Count == 0) return;
+                if (selectColor == null || 相同Rng.Count == 0) return;
 
-                ShowWaitCursor();
-                EnableControls(false);
-
-                // 优化Excel性能
                 excelapp.ScreenUpdating = false;
                 excelapp.Calculation = XlCalculation.xlCalculationManual;
 
                 // 按工作表分组处理Range
-                var rangesByWorksheet = ranges.GroupBy(r => r.Worksheet);
+                var rangesByWorksheet = 相同Rng.GroupBy(r => r.Worksheet);
 
                 foreach (var group in rangesByWorksheet)
                 {
@@ -492,21 +467,13 @@ namespace Radiant.MyForm
                     }
                 }
 
-                // MessageBox.Show($"已成功{operationName}", "操作完成", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                excelapp.ScreenUpdating = true;
+                excelapp.Calculation = XlCalculation.xlCalculationAutomatic;
             }
             catch (Exception ex)
             {
-                LogException($"{operationName}失败", ex);
-                // MessageBox.Show($"{operationName}失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            finally
-            {
-                // 恢复Excel设置
-                excelapp.ScreenUpdating = true;
-                excelapp.Calculation = XlCalculation.xlCalculationAutomatic;
-
-                EnableControls(true);
-                HideWaitCursor();
+                LogException("标记相同项失败", ex);
+                MessageBox.Show($"标记相同项失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -534,16 +501,56 @@ namespace Radiant.MyForm
         }
 
         /// <summary>
+        /// 标记不同项按钮点击事件
+        /// </summary>
+        private void 不同项_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (selectColor == null || 不同Rng.Count == 0) return;
+
+                excelapp.ScreenUpdating = false;
+                excelapp.Calculation = XlCalculation.xlCalculationManual;
+
+                var rangesByWorksheet = 不同Rng.GroupBy(r => r.Worksheet);
+
+                foreach (var group in rangesByWorksheet)
+                {
+                    Worksheet ws = group.Key;
+                    Range combinedRange = null;
+
+                    foreach (Range range in group)
+                    {
+                        if (combinedRange == null)
+                            combinedRange = range;
+                        else
+                            combinedRange = SafeUnionSameSheet(combinedRange, range);
+                    }
+
+                    if (combinedRange != null)
+                    {
+                        ws.Activate();
+                        combinedRange.Interior.Color = selectColor.Value.ToArgb();
+                    }
+                }
+
+                excelapp.ScreenUpdating = true;
+                excelapp.Calculation = XlCalculation.xlCalculationAutomatic;
+            }
+            catch (Exception ex)
+            {
+                LogException("标记不同项失败", ex);
+                MessageBox.Show($"标记不同项失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
         /// 清除标记按钮点击事件
         /// </summary>
         private void 清除标识_Click(object sender, EventArgs e)
         {
             try
             {
-                ShowWaitCursor();
-                EnableControls(false);
-
-                // 优化Excel性能
                 excelapp.ScreenUpdating = false;
                 excelapp.Calculation = XlCalculation.xlCalculationManual;
 
@@ -569,30 +576,20 @@ namespace Radiant.MyForm
                     if (combinedRange != null)
                     {
                         ws.Activate();
-                        combinedRange.Interior.Color = XlRgbColor.rgbWhite; // 恢复为白色
+                        combinedRange.Interior.Color = XlColorIndex.xlColorIndexNone;
                     }
                 }
 
-                MessageBox.Show("已清除所有标记", "操作完成", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                excelapp.ScreenUpdating = true;
+                excelapp.Calculation = XlCalculation.xlCalculationAutomatic;
 
-                // 清空结果
-                相同Rng.Clear();
-                不同Rng.Clear();
-                UpdateDisplay(commonKeys, uniqueKeys1, uniqueKeys2);
+                Button button = (Button)sender;
+                button.Enabled = false;
             }
             catch (Exception ex)
             {
                 LogException("清除标记失败", ex);
                 MessageBox.Show($"清除标记失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            finally
-            {
-                // 恢复Excel设置
-                excelapp.ScreenUpdating = true;
-                excelapp.Calculation = XlCalculation.xlCalculationAutomatic;
-
-                EnableControls(true);
-                HideWaitCursor();
             }
         }
 
@@ -601,46 +598,23 @@ namespace Radiant.MyForm
         /// </summary>
         private void 导出相同项_Click(object sender, EventArgs e)
         {
-            ExportItems(相同Rng, "相同项");
-        }
-
-        /// <summary>
-        /// 导出不同项按钮点击事件
-        /// </summary>
-        private void 导出不同项_Click(object sender, EventArgs e)
-        {
-            ExportItems(不同Rng, "不同项");
-        }
-
-        /// <summary>
-        /// 导出项目的公共方法
-        /// </summary>
-        private void ExportItems(List<Range> ranges, string itemType)
-        {
-            if (ranges == null || ranges.Count == 0)
-            {
-                MessageBox.Show($"没有{itemType}可导出", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
+            if (commonKeys == null || commonKeys.Count == 0) return;
 
             try
             {
-                ShowWaitCursor();
-                EnableControls(false);
-
                 BringExcelToFront();
                 this.Hide();
 
-                Range targetRange = (Range)excelapp.InputBox(
+                Range rng = (Range)excelapp.InputBox(
                     Prompt: "请选择目标单元格",
-                    Title: $"导出{itemType}",
+                    Title: "导出相同项",
                     Default: "",
                     Type: 8);
 
-                if (targetRange != null)
+                if (rng != null)
                 {
                     // 提取数据并去重
-                    var values = ranges.Select(cell => cell.Value2)
+                    var values = 相同Rng.Select(cell => cell.Value2)
                                       .Where(v => v != null)  // 过滤空值
                                       .Distinct()            // 去重
                                       .ToList();
@@ -649,22 +623,17 @@ namespace Radiant.MyForm
                     object[,] data = ConvertToExcelArray(values);
 
                     // 导出数据
-                    targetRange.Resize[data.GetLength(0), data.GetLength(1)].Value2 = data;
+                    rng.Resize[data.GetLength(0), data.GetLength(1)].Value2 = data;
 
-                    MessageBox.Show($"已导出 {values.Count} 个去重后的{itemType}",
+                    MessageBox.Show($"已导出 {values.Count} 个去重后的相同项",
                                    "导出完成", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 this.Show();
             }
             catch (Exception ex)
             {
-                LogException($"导出{itemType}失败", ex);
-                MessageBox.Show($"导出{itemType}失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            finally
-            {
-                EnableControls(true);
-                HideWaitCursor();
+                LogException("导出相同项失败", ex);
+                MessageBox.Show($"导出相同项失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -689,6 +658,51 @@ namespace Radiant.MyForm
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// 导出不同项按钮点击事件
+        /// </summary>
+        private void 导出不同项_Click(object sender, EventArgs e)
+        {
+            if (uniqueKeys1 == null || uniqueKeys2 == null ||
+                (uniqueKeys1.Count == 0 && uniqueKeys2.Count == 0)) return;
+
+            try
+            {
+                BringExcelToFront();
+                this.Hide();
+
+                Range rng = (Range)excelapp.InputBox(
+                    Prompt: "请选择目标单元格",
+                    Title: "导出不同项",
+                    Default: "",
+                    Type: 8);
+
+                if (rng != null)
+                {
+                    // 提取数据并去重
+                    var values = 不同Rng.Select(cell => cell.Value2)
+                                      .Where(v => v != null)  // 过滤空值
+                                      .Distinct()            // 去重
+                                      .ToList();
+
+                    // 转换为Excel所需的二维数组
+                    object[,] data = ConvertToExcelArray(values);
+
+                    // 导出数据
+                    rng.Resize[data.GetLength(0), data.GetLength(1)].Value2 = data;
+
+                    MessageBox.Show($"已导出 {values.Count} 个去重后的不同项",
+                                   "导出完成", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                this.Show();
+            }
+            catch (Exception ex)
+            {
+                LogException("导出不同项失败", ex);
+                MessageBox.Show($"导出不同项失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         /// <summary>
@@ -777,21 +791,6 @@ namespace Radiant.MyForm
         {
             this.Cursor = Cursors.Default;
             isProcessingExcel = false;
-        }
-
-        /// <summary>
-        /// 启用或禁用控件
-        /// </summary>
-        private void EnableControls(bool enable)
-        {
-            pictureBox1.Enabled = enable;
-            pictureBox2.Enabled = enable;
-            对比数据.Enabled = enable;
-            相同项.Enabled = enable && 相同项.Enabled;
-            不同项.Enabled = enable && 不同项.Enabled;
-            清除标识.Enabled = enable && 清除标识.Enabled;
-            导出相同项.Enabled = enable && 导出相同项.Enabled;
-            导出不同项.Enabled = enable && 导出不同项.Enabled;
         }
 
         /// <summary>
