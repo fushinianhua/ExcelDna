@@ -1,19 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using ExcelDna.Integration;
+﻿using ExcelDna.Integration;
 using ExcelDna.Integration.CustomUI;
 using ExcelDnaXP.Myform;
 using Microsoft.Office.Interop.Excel;
-using ExcelApp = Microsoft.Office.Interop.Excel.Application;
-using System.IO;
-using Radiant.Properties;
+using Microsoft.SqlServer.Server;
 using Radiant.MyCalss;
+using Radiant.MyClass;
 using Radiant.Myform;
-using System.Runtime.Remoting.Channels;
+using Radiant.MyForm;
+using Radiant.Properties;
+using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Drawing;
+using System.IO;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using Application = Microsoft.Office.Interop.Excel.Application;
 
 namespace Radiant
 {
@@ -22,19 +26,15 @@ namespace Radiant
     [Guid("EA0EB0A4-EA0E-4E0E-B0A4-EA0EEA0EEA0E")]
     public class MyRibbon : ExcelRibbon
     {
-        // 存储每个 Excel 实例对应的 MyRibbon 状态
-        private static readonly Dictionary<ExcelApp, MyRibbon> RibbonInstances = new Dictionary<ExcelApp, MyRibbon>();
-
         #region 变量定义
 
-        private static ExcelApp excel;
-        private IRibbonUI Ribbon;
-        public static bool _isRegistered = false;
+        // 实例级字段，每个Excel实例独立拥有
+        private Application _excelApp;
 
-        /// <summary>
-        /// 所有按钮状态
-        /// </summary>
-        private readonly Dictionary<string, bool> 按钮状态列表 = new Dictionary<string, bool>();
+        private IRibbonUI _ribbon;
+        private ExcelAppEvents _appEvents;
+        private bool _isRunning = false;
+        private 条形码 _BarcodeForm = null;
 
         /// <summary>
         /// 按钮图片 第一个为按钮ID ,第二个为图片资源
@@ -49,7 +49,6 @@ namespace Radiant
         /// <summary>
         /// 保护按钮
         /// </summary>
-
         private readonly List<string> _protectedButtons = new List<string>
         {
             "CalculateButton",
@@ -57,74 +56,100 @@ namespace Radiant
             "InsertButton",
             "密码",
             "条码Menu",
-            "MainMenu"
+            "MainMenu",
+            "统计"
         };
+
+        /// <summary>
+        /// 获取当前实例的状态管理对象
+        /// </summary>
+        private InstanceState CurrentInstanceState => InstanceManager.GetCurrentInstanceState();
 
         #endregion 变量定义
 
         /// <summary>
-        /// 检查注册状态
+        /// 加载时执行
+        /// </summary>
+        public void OnLoad(IRibbonUI ribbon)
+        {
+            _ribbon = ribbon;
+            _excelApp = ExcelDnaUtil.Application as Application;
+
+            // 注册工作簿事件，用于实例销毁时清理数据
+            RegisterWorkbookEvents();
+
+            //打开指定工作簿（仅在当前实例执行）
+            //if (!string.IsNullOrEmpty("C:\\Users\\辛鹏\\Desktop\\test.xlsx"))
+            //{
+            //    _excelApp.Workbooks.Open("C:\\Users\\辛鹏\\Desktop\\test.xlsx");
+            //}
+
+            // 初始化状态
+            CheckRegistration();
+            //ShowSettingsPath();
+        }
+
+        /// <summary>
+        /// 优化后的注册状态检查方法
         /// </summary>
         private void CheckRegistration()
         {
             try
             {
-                string cpuid = 加密算法.获取CPUID();
-                string 机器码 = 加密算法.生成机器码(cpuid);
-                string 注册码 = Settings.Default.注册码;
-                bool 结果 = Settings.Default.注册状态;
-                string 激活码 = 加密算法.EncryptAndFormat(机器码);
-                bool falg = 注册码 == 激活码 || 注册码 == "21218308";
-                if (falg && 结果)
-                {
-                    _isRegistered = true;
-                    return;
-                }
-                else
-                {
-                    if (!结果)
-                    {
-                        Settings.Default.注册状态 = false;
-                        Settings.Default.注册码 = "";
-                        Settings.Default.Save();
-                        Settings.Default.Upgrade();
-                    }
-                }
+                // 确保加密算法已初始化
+                加密算法.Initialize();
+
+                string machineCode = 加密算法.注册码;
+                string savedCode = Settings.Default.注册码;
+                bool savedState = Settings.Default.激活状态;
+
+                // 生成当前机器码对应的激活码
+                string activationCode = 加密算法.EncryptAndFormat(加密算法.CPUID);
+
+                // 验证逻辑：激活状态为True且注册码有效
+                bool falg = savedState &&
+                           (!string.IsNullOrEmpty(savedCode) &&
+                            (savedCode == machineCode || savedCode == 加密算法.密钥));
+
+                // 显示调试信息
+                //MessageBox.Show($"机器码: {machineCode}\n" +
+                //              $"激活码: {activationCode}\n" +
+                //              $"注册码: {savedCode}\n" +
+                //              $"密钥: {加密算法.密钥}\n" +
+                //              $"结果: {falg}\n" +
+                //              $"状态: {savedState}");
+
+                // 更新实例状态
+                CurrentInstanceState.IsRegistered = falg;
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"注册状态检查失败: {ex.Message}");
+                LogError(ex, "注册状态检查失败");
+                //  MessageBox.Show($"注册状态检查失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         /// <summary>
         /// 获取按钮状态
         /// </summary>
-        /// <param name="control"></param>
-        /// <returns></returns>
         public bool GetButtonEnabled(IRibbonControl control)
         {
-            return _protectedButtons.Contains(control.Id) ? _isRegistered : true;
+            bool falg = _protectedButtons.Contains(control.Id) ? CurrentInstanceState.IsRegistered : true;
+            return falg;
         }
-
-        private bool IsRunning = false;
 
         /// <summary>
         /// 获取按钮文字
         /// </summary>
-        /// <param name="control"></param>
-        /// <returns></returns>
         public string 获取文本文字(IRibbonControl control)
         {
-            IsRunning = !IsRunning;
-            return IsRunning ? "运行" : "停止";
+            _isRunning = !_isRunning;
+            return _isRunning ? "运行" : "停止";
         }
 
         /// <summary>
         /// 获取自定义UI
         /// </summary>
-        /// <param name="RibbonID"></param>
-        /// <returns></returns>
         public override string GetCustomUI(string RibbonID)
         {
             return ResourceHelper.GetResourceText("Ribbon.xml");
@@ -133,115 +158,111 @@ namespace Radiant
         /// <summary>
         /// 加载图片
         /// </summary>
-        /// <param name="imageId"></param>
-        /// <returns></returns>
         public override object LoadImage(string imageId)
         {
             return ResourceHelper.GetEmbeddedResourceBitmap(imageId + ".png");
         }
 
-        /// <summary>
-        /// 加载时执行
-        /// </summary>
-        public void OnLoad(IRibbonUI ribbon)
+        public void ShowSettingsPath()
         {
-            Ribbon = ribbon;
-            excel = ExcelDnaUtil.Application as ExcelApp;
-            RibbonInstances[excel] = this;
-            CheckRegistration();
+            try
+            {
+                // 方法1：获取.NET Application Settings的路径（若使用）
+                string settingsPath = ConfigurationManager.OpenExeConfiguration(
+                    ConfigurationUserLevel.PerUserRoamingAndLocal).FilePath;
+                MessageBox.Show($"Settings路径: {settingsPath}");
+
+                // 方法2：获取程序集目录（自定义配置文件可能在此）
+                string assemblyPath = Path.GetDirectoryName(
+                    Assembly.GetExecutingAssembly().Location);
+                MessageBox.Show($"程序集目录: {assemblyPath}");
+
+                // 方法3：获取用户数据目录（自定义文件常见位置）
+                string appDataPath = Environment.GetFolderPath(
+                    Environment.SpecialFolder.LocalApplicationData);
+                MessageBox.Show($"用户数据目录: {appDataPath}");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"查找路径失败: {ex.Message}");
+            }
         }
 
-        private List<string> 单元格修改列表 = new List<string>();
-        private List<string> 单元格删除列表 = new List<string>();
-
-        public static void 恢复单元格(ExcelApp excel)
+        /// <summary>
+        /// 注册工作簿事件，用于清理实例数据
+        /// </summary>
+        private void RegisterWorkbookEvents()
         {
-            if (RibbonInstances.TryGetValue(excel, out var myRibbon))
+            try
             {
-                if (myRibbon.单元格修改列表.Count > 0)
+                // 创建事件处理对象并保持引用
+                _appEvents = new ExcelAppEvents(_excelApp, wb =>
                 {
-                    foreach (var item in myRibbon.单元格修改列表)
-                    {
-                        excel.Range[item].Value2 = "";
-                    }
-                    // 恢复后清空列表（可选）
-                    myRibbon.单元格修改列表.Clear();
-                }
-                else
-                {
-                    MessageBox.Show("无内容可撤销！");
-                }
+                    // 工作簿关闭时清理当前实例的数据
+                    InstanceManager.CleanupCurrentInstanceState();
+                });
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show("未找到对应的 Ribbon 实例！");
+                LogError(ex, "注册工作簿事件失败");
             }
         }
 
         /// <summary>
         /// 获取按钮图片
         /// </summary>
-        /// <param name="control"></param>
-        /// <returns></returns>
         public Bitmap 获取按钮图片(IRibbonControl control)
         {
-            // 初始化默认状态
-            if (!按钮状态列表.ContainsKey(control.Id))
+            // 从当前实例的状态中获取按钮状态
+            if (!CurrentInstanceState.ButtonStates.TryGetValue(control.Id, out bool state))
             {
-                按钮状态列表[control.Id] = true;
+                state = true; // 默认启用
+                CurrentInstanceState.ButtonStates[control.Id] = state;
             }
 
             // 获取对应的图片资源
             if (_buttonImages.TryGetValue(control.Id, out var images))
             {
-                var imageName = 按钮状态列表[control.Id] ? images.开图片 : images.关图片;
+                var imageName = state ? images.开图片 : images.关图片;
                 return ResourceHelper.GetEmbeddedResourceBitmap(imageName);
             }
 
             // 默认返回第一个按钮的图片
-            return ResourceHelper.GetEmbeddedResourceBitmap(_buttonImages["button1"].开图片);
+            return ResourceHelper.GetEmbeddedResourceBitmap(_buttonImages["TestButton"].开图片);
         }
 
         public void TestAction(IRibbonControl control)
         {
-            // 安全更新状态
-            if (!按钮状态列表.TryGetValue(control.Id, out bool state))
+            // 安全更新当前实例的按钮状态
+            if (!CurrentInstanceState.ButtonStates.TryGetValue(control.Id, out bool state))
             {
                 state = true;
             }
-            按钮状态列表[control.Id] = !state;
+            CurrentInstanceState.ButtonStates[control.Id] = !state;
 
-            Ribbon.InvalidateControl(control.Id);
+            _ribbon.InvalidateControl(control.Id);
         }
 
         /// <summary>
         /// 生成Action
         /// </summary>
-        /// <param name="control"></param>
-        // 生成Action方法
         public void 生成Action(IRibbonControl control)
         {
-            Worksheet sheet = excel.ActiveSheet;
+            if (_excelApp == null) return;
+
+            Worksheet sheet = _excelApp.ActiveSheet;
             try
             {
-                Range rng = excel.Selection;
-                string str = rng.Address;
-                单元格修改列表.Add(str);
-
-                rng.Value = "Hello ExcelDNA!";
-
+                Range rng = _excelApp.Selection;
+                if (rng == null) return;
                 Range resizedRng = rng.Resize[2, 2];
                 resizedRng.Formula = "=SUM(1,2,3)";
-                单元格修改列表.Add(resizedRng.Address);
-
-                MessageBox.Show($"已记录修改项数: {单元格修改列表.Count}");
-
-                // 注册宏名称必须与 ExcelDNA 中注册的一致
-                excel.OnUndo("撤销", "恢复单元格宏");
+                MessageBox.Show($"已记录修改项数: {rng.Count}");
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"操作失败: {ex.Message}");
+                LogError(ex, "生成操作失败");
+                MessageBox.Show($"操作失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -249,19 +270,12 @@ namespace Radiant
             }
         }
 
-        public static void 恢复单元格宏()
-        {
-            恢复单元格(excel);
-        }
-
         public void 计算Action(IRibbonControl control)
         {
             try
             {
-                // 获取活动工作表
-
-                Worksheet sheet = excel.ActiveSheet;
-                Range rng = excel.Selection;
+                Worksheet sheet = _excelApp.ActiveSheet;
+                Range rng = _excelApp.Selection;
 
                 if (rng == null) return;
 
@@ -287,12 +301,11 @@ namespace Radiant
                     range.Resize[count, 1].Value2 = value;
                 }
 
-                shifang(excel);
+                shifang(_excelApp);
                 shifang(sheet);
             }
             catch (Exception ex)
             {
-                // 可以根据实际情况添加日志记录
                 Console.WriteLine($"发生异常: {ex.Message}");
             }
         }
@@ -386,14 +399,10 @@ namespace Radiant
             MessageBox.Show("Hello!");
         }
 
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="control"></param>
         public void InsertRange(IRibbonControl control)
         {
-            Worksheet sheet = excel.ActiveSheet;
-            Range selectRng = excel.Selection;
+            Worksheet sheet = _excelApp.ActiveSheet;
+            Range selectRng = _excelApp.Selection;
             try
             {
                 int count = selectRng.Rows.Count;
@@ -421,25 +430,11 @@ namespace Radiant
             }
         }
 
-        /// <summary>
-        /// 删除行
-        /// </summary>
-        /// <param name="control"></param>
-        public void DeleRange(IRibbonControl control)
-        {
-            Worksheet sheet = excel.ActiveSheet;
-            Range selectRng = excel.Selection;
-        }
-
-        /// <summary>
-        /// 破解VBA密码
-        /// </summary>
-        /// <param name="control"></param>
         public void 破解VBA密码(IRibbonControl control)
         {
             try
             {
-                string prdcode = excel.ProductCode;
+                string prdcode = _excelApp.ProductCode;
                 string[] pds = prdcode.Split('-');
                 if (pds.Length > 4)
                 {
@@ -464,13 +459,26 @@ namespace Radiant
         /// <summary>
         /// 记录错误信息
         /// </summary>
-        /// <param name="ex"></param>
+        /// <param name="ex">表示应用程序在运行时发生的错误信息</param>
         /// <param name="additionalMessage"></param>
         private static void LogError(Exception ex, string additionalMessage = "")
         {
             try
             {
-                string logFilePath = "error_log.txt";
+                // 获取当前程序集的目录
+                string assemblyPath = Assembly.GetExecutingAssembly().Location;
+                string assemblyDirectory = Path.GetDirectoryName(assemblyPath);
+
+                // 确保日志文件路径在程序集同级目录
+                string logFilePath = Path.Combine(assemblyDirectory, "error_log.txt");
+
+                // 确保目录存在
+                string logDirectory = Path.GetDirectoryName(logFilePath);
+                if (!Directory.Exists(logDirectory))
+                {
+                    Directory.CreateDirectory(logDirectory);
+                }
+
                 using (StreamWriter writer = File.AppendText(logFilePath))
                 {
                     writer.WriteLine($"时间: {DateTime.Now}");
@@ -478,8 +486,17 @@ namespace Radiant
                     {
                         writer.WriteLine($"附加信息: {additionalMessage}");
                     }
-                    writer.WriteLine($"错误信息: {ex.Message}");
-                    writer.WriteLine($"堆栈跟踪: {ex.StackTrace}");
+
+                    if (ex != null)
+                    {
+                        writer.WriteLine($"错误信息: {ex.Message}");
+                        writer.WriteLine($"堆栈跟踪: {ex.StackTrace}");
+                    }
+                    else
+                    {
+                        writer.WriteLine($"错误信息: 未提供异常对象");
+                    }
+
                     writer.WriteLine(new string('-', 50));
                 }
             }
@@ -489,15 +506,11 @@ namespace Radiant
             }
         }
 
-        /// <summary>
-        /// 破解工作薄密码
-        /// </summary>
-        /// <param name="control"></param>
         public void 破解工作薄密码(IRibbonControl control)
         {
             try
             {
-                ClassRemoveSheetPassword sheetClass = new ClassRemoveSheetPassword(excel);
+                ClassRemoveSheetPassword sheetClass = new ClassRemoveSheetPassword(_excelApp);
                 sheetClass.UnprotectWorkBookPassword();
             }
             catch (Exception ex)
@@ -506,15 +519,11 @@ namespace Radiant
             }
         }
 
-        /// <summary>
-        /// 破解工作表密码
-        /// </summary>
-        /// <param name="control"></param>
         public void 破解工作表密码(IRibbonControl control)
         {
             try
             {
-                ClassRemoveSheetPassword sheetClass = new ClassRemoveSheetPassword(excel);
+                ClassRemoveSheetPassword sheetClass = new ClassRemoveSheetPassword(_excelApp);
                 sheetClass.UnprotectSheetPassword();
             }
             catch (Exception ex)
@@ -523,15 +532,18 @@ namespace Radiant
             }
         }
 
-        private 条形码 form = null;
+        public void 相同项对比(IRibbonControl control)
+        {
+            数据对比 dataCompare = new 数据对比(
+                _excelApp);
+            dataCompare.Show();
+        }
 
         public void 生成条形码(IRibbonControl control)
         {
             try
             {
-                条形码 form = new 条形码(
-                   公用.BarType.CODE_128, excel);
-                form.Show();
+                ShowBarcodeForm(公用.BarType.CODE_128);
             }
             catch (Exception)
             {
@@ -543,10 +555,7 @@ namespace Radiant
         {
             try
             {
-                条形码 form = new 条形码(
-                  公用.BarType.QR_CODE, excel);
-
-                form.Show();
+                ShowBarcodeForm(公用.BarType.QR_CODE);
             }
             catch (Exception)
             {
@@ -554,14 +563,11 @@ namespace Radiant
             }
         }
 
-        public void 批量生成条形码(IRibbonControl control)
+        public void 批量生成条形码(IRibbonControl control)//批量生成条形码
         {
             try
             {
-                条形码 form = new 条形码(
-                  公用.BarType.CODE_128, excel, true);
-
-                form.Show();
+                ShowBarcodeForm(公用.BarType.CODE_128, true);
             }
             catch (Exception)
             {
@@ -569,12 +575,40 @@ namespace Radiant
             }
         }
 
-        public void 添加批注(IRibbonControl control)
+        // 合并三个方法为一个通用方法
+        private void ShowBarcodeForm(公用.BarType barType, bool isBatch = false)
         {
-            Range selectRng = excel.Selection;
             try
             {
-                关闭屏幕刷新(excel);
+                // 检查当前窗体是否存在，如果存在则关闭它
+                if (_BarcodeForm != null && !_BarcodeForm.IsDisposed)
+                {
+                    // 可以选择提示用户，或直接关闭
+                    _BarcodeForm.Close();
+                }
+
+                // 创建新窗体实例
+                _BarcodeForm = new 条形码(barType, _excelApp, isBatch);
+
+                // 设置窗体关闭时的事件处理，将引用置为null
+                _BarcodeForm.FormClosed += (sender, e) => _BarcodeForm = null;
+
+                // 显示窗体
+                _BarcodeForm.Show();
+            }
+            catch (Exception ex)
+            {
+                LogError(ex, "显示条形码窗体失败");
+                MessageBox.Show($"操作失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        public void 添加批注(IRibbonControl control) //批注
+        {
+            Range selectRng = _excelApp.Selection;
+            try
+            {
+                关闭屏幕刷新(_excelApp);
                 foreach (Range rng in selectRng)
                 {
                     if (rng.Comment == null)
@@ -588,16 +622,15 @@ namespace Radiant
                 throw;
             }
             finally
-
             {
-                开启屏幕刷新(excel);
+                开启屏幕刷新(_excelApp);
                 shifang(selectRng);
             }
         }
 
         public void 删除批注(IRibbonControl control)
         {
-            Range rng = excel.Selection;
+            Range rng = _excelApp.Selection;
             try
             {
                 if (rng.Comment != null)
@@ -617,7 +650,7 @@ namespace Radiant
 
         public void 删除所有批注(IRibbonControl control)
         {
-            Worksheet worksheet = excel.ActiveSheet;
+            Worksheet worksheet = _excelApp.ActiveSheet;
             Range rng = worksheet.UsedRange;
             try
             {
@@ -643,59 +676,395 @@ namespace Radiant
             }
         }
 
+        public void 数据统计(IRibbonControl control)
+        {
+            try
+            {
+                关闭屏幕刷新(_excelApp);
+                Worksheet worksheet = _excelApp.Worksheets[2];//获取工作表
+                if (worksheet == null || worksheet.Name != "MIB-OQC离职率统计") throw new Exception("工作表名称错误");
+                Worksheet sheetdata = _excelApp.Worksheets[3];
+                if (sheetdata == null || sheetdata.Name != "后道人员") throw new Exception("工作表名称错误");
+                Range rng = worksheet.Range["C14:C33"];
+                List<ItemData> itemDatas = new List<ItemData>();
+                foreach (Range cell in rng.Cells)
+                {
+                    itemDatas.Add(new ItemData(cell.Value2.ToString(), cell.Row, 0));
+                }
+                DateTime dateTime;
+                // 获取当前日期
+                DateTime currentDate = DateTime.Now;
+
+                // 计算前一天的日期
+                DateTime previousDate = currentDate.AddDays(-1);
+
+                if (previousDate.DayOfWeek == DayOfWeek.Sunday)
+                {
+                    dateTime = currentDate.AddDays(-2);
+                }
+                else
+                {
+                    dateTime = previousDate;
+                }
+
+                int CurrentCol = 0;
+                int Col = sheetdata.UsedRange.Columns.Count;
+                int Row = sheetdata.UsedRange.Rows.Count;
+                Range rng2 = sheetdata.Range[sheetdata.Cells[2, 1], sheetdata.Cells[2, Col]];
+                Range rng3 = null;
+                foreach (Range cell in rng2.Cells)
+                {
+                    if (IsDate(cell, dateTime, out CurrentCol))
+                        break;
+                }
+                int 源列 = 0;
+                Range rng4 = worksheet.Rows[4];
+                foreach (Range cell in rng4.Cells)
+                {
+                    if (IsDate(cell, dateTime, out 源列))
+                        break;
+                }
+                if (源列 <= 0)
+                {
+                    throw new Exception("没有找到日期列");
+                }
+                if (CurrentCol > 0)
+                {
+                    rng3 = sheetdata.Range[sheetdata.Cells[4, CurrentCol], sheetdata.Cells[Row, CurrentCol]];
+                }
+                else
+                {
+                    throw new Exception("没有找到日期列");
+                }
+                int CountAll = 0;
+                int numbercount = 0;
+                if (rng3 == null)
+                {
+                    throw new Exception("请选择数据范围");
+                }
+                List<Range> ranges = new List<Range>();
+                foreach (Range cell in rng3.Cells)
+                {
+                    int number;
+                    if (cell.Value2 == null) { continue; }
+                    if (!int.TryParse(cell.Value.ToString(), out number))
+                    {
+                        ranges.Add(cell);
+                    }
+                    else
+                    {
+                        numbercount++;
+                    }
+                    CountAll++;
+                }
+                List<string> 正常离职列表 = new List<string>();
+                List<string> 自离列表 = new List<string>();
+                foreach (ItemData item in itemDatas)
+                {
+                    string str = item.Name;
+
+                    foreach (Range cell in ranges)
+                    {
+                        string cellText = cell.Value.ToString();
+                        switch (str)
+                        {
+                            case "曠工":
+                                if (cellText.IndexOf("曠一", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                                    cellText.IndexOf("曠二", StringComparison.OrdinalIgnoreCase) >= 0)
+                                {
+                                    item.Count++;
+                                }
+                                break;
+
+                            case "正常離職":
+                                if (cellText.IndexOf("辦離職", StringComparison.OrdinalIgnoreCase) >= 0)
+                                {
+                                    item.Count++;
+                                    int row = cell.Row;
+                                    Range r = sheetdata.Cells[row, 3];
+                                    正常离职列表.Add(r.Value);
+                                    shifang(r);
+                                }
+                                break;
+
+                            case "離職人數(自離)":
+                                if (cellText.IndexOf("曠三", StringComparison.OrdinalIgnoreCase) >= 0)
+                                {
+                                    item.Count++;
+                                    int row = cell.Row;
+                                    Range r = sheetdata.Cells[row, 3];
+                                    自离列表.Add(r.Value);
+                                    shifang(r);
+                                }
+                                break;
+
+                            default:
+                                if (cellText.IndexOf(str, StringComparison.OrdinalIgnoreCase) >= 0)
+                                {
+                                    item.Count++;
+                                }
+
+                                break;
+                        }
+                    }
+                }
+
+                foreach (var item in itemDatas)
+                {
+                    Range r = worksheet.Cells[item.Row, 源列];
+                    if (item.Count > 0)
+                        r.Value2 = item.Count;
+                    shifang(r);
+                }
+                // 将 List 内容用换行符连接
+                string 正常离职列表字符串 = string.Join(Environment.NewLine, 正常离职列表);
+                string 自离列表字符串 = string.Join(Environment.NewLine, 自离列表);
+                Range range = null;
+                if (正常离职列表.Count > 0)
+                {
+                    range = worksheet.Cells[32, 源列];
+                    range.AddComment(正常离职列表字符串);
+                }
+
+                if (自离列表.Count > 0)
+                {
+                    range = worksheet.Cells[33, 源列];
+                    range.AddComment(自离列表字符串);
+                }
+
+                shifang(range);
+                // 确保CountAll不为零，防止除零错误
+                if (CountAll <= 0)
+                {
+                    throw new Exception("统计总数为零，无法计算百分比");
+                }
+
+                // 定义要填充数据的单元格及其对应的值
+                var dataToFill = new Dictionary<int, Func<string>>
+                    {
+                        { 6, () => CountAll.ToString() },
+                        { 7, () => numbercount.ToString() },
+                        { 8, () => (CountAll - numbercount).ToString() },
+                        { 9, () => ((double)numbercount / CountAll).ToString("P2") },
+                        { 10, () => ((double)(CountAll - numbercount) / CountAll).ToString("P2") }
+                    };
+
+                // 填充基础数据
+                // 填充基础数据
+                foreach (var item in dataToFill)
+                {
+                    worksheet.Cells[item.Key, 源列].Value = item.Value();
+                }
+
+                // 获取最后两项统计数据
+                var value1 = itemDatas[itemDatas.Count - 2].Count;
+                var value2 = itemDatas[itemDatas.Count - 1].Count;
+
+                // 定义条件数据
+                var conditionalData = new Dictionary<int, Func<string>>
+                {
+                    { 11, () => value1 > 0 ? ((double)value1 / CountAll).ToString("P2") : "0.00%"},
+                    { 12, () => value2 > 0 ? ((double)value2 / CountAll).ToString("P2") : "0.00%"},
+                    { 13, () => (value1 + value2) > 0 ? ((double)(value1 + value2) / CountAll).ToString("P2") :"0.00%" }
+                };
+
+                // 填充条件数据
+                foreach (var item in conditionalData)
+                {
+                    string value = item.Value();
+                    if (value != null)
+                    {
+                        worksheet.Cells[item.Key, 源列].Value = value;
+                    }
+                }
+
+                开启屏幕刷新(_excelApp);
+                MessageBox.Show("数据统计尚在优化");
+            }
+            catch (Exception ex)
+            {
+                开启屏幕刷新(_excelApp);
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        // 日期匹配方法
+        private bool IsDate(Range rng, DateTime dateTime, out int CurrentCol)
+        {
+            CurrentCol = 0;
+
+            // 跳过空单元格
+            if (rng.Value2 == null)
+            {
+                return false;
+            }
+
+            try
+            {
+                DateTime cellDate;
+
+                // 处理数字格式的日期
+                if (rng.Value is double)
+                {
+                    cellDate = DateTime.FromOADate((double)rng.Value2);
+                }
+                // 处理字符串格式的日期
+                else if (rng.Value is string)
+                {
+                    if (!DateTime.TryParse((string)rng.Value2, out cellDate))
+                    {
+                        return false;
+                    }
+                }
+                // 处理DateTime对象
+                else if (rng.Value is DateTime)
+                {
+                    cellDate = (DateTime)rng.Value;
+                }
+                else
+                {
+                    // 不是日期类型
+                    return false;
+                }
+
+                // 比较日期部分
+                if (cellDate.Date == dateTime.Date)
+                {
+                    // 保存匹配的列号
+                    CurrentCol = rng.Column;
+                    return true;
+                }
+
+                return false;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }// 判断当前单元格是否为指定日期
+
+        /// <summary>
+        /// 注册功能
+        /// </summary>
         public void 注册(IRibbonControl control)
         {
             try
             {
-                if (_isRegistered)
+                if (CurrentInstanceState.IsRegistered)
                 {
-                    MessageBox.Show("您已经注册过了！");
+                    MessageBox.Show("您已经注册过了！", "注册提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
-                注册界面 form = new 注册界面();
-                form.FormClosed += (sende, e) =>
+
+                加密算法.Initialize();
+
+                注册界面 form = new 注册界面
+                {
+                    机器码 = 加密算法.注册码,
+                    Text = "Radiant插件注册"
+                };
+
+                form.FormClosed += (sender, e) =>
+                {
+                    if (form.激活状态)
                     {
-                        _isRegistered = form.注册成功;
-                        if (_isRegistered)
+                        // 保存用户输入的注册码
+                        Settings.Default.注册码 = form.机器码;
+                        Settings.Default.激活状态 = true;
+                        Settings.Default.激活码 = form.激活码;
+                        Settings.Default.Save();
+
+                        // 更新实例状态
+                        CurrentInstanceState.IsRegistered = true;
+
+                        // 刷新Ribbon
+                        if (_ribbon != null)
                         {
-                            Ribbon.Invalidate();
+                            _ribbon.Invalidate();
                         }
-                    };
-                form.Show();
+
+                        MessageBox.Show("注册成功！", "注册结果", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else if (!string.IsNullOrEmpty(form.错误信息))
+                    {
+                        MessageBox.Show($"注册失败: {form.错误信息}", "注册结果", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                };
+
+                form.ShowDialog();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                LogError(ex, "注册过程发生错误");
+                MessageBox.Show($"注册过程发生错误: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
+        /// <summary>
+        /// 取消注册
+        /// </summary>
         public void 取消注册(IRibbonControl control)
         {
-            Settings.Default.注册状态 = false;
-            Settings.Default.注册码 = "";
-            Settings.Default.Save();
+            try
+            {
+                Settings.Default.激活状态 = false;
+                Settings.Default.激活码 = "";
+                Settings.Default.注册码 = "";
+                Settings.Default.Save();
+
+                CurrentInstanceState.IsRegistered = false;
+                _ribbon.Invalidate();
+
+                MessageBox.Show("已取消注册", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"取消注册失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
-        private void 开启屏幕刷新(ExcelApp app)
+        private void 开启屏幕刷新(Application app)
         {
             app.ScreenUpdating = true;
             app.Calculation = XlCalculation.xlCalculationAutomatic;
-            shifang(app);
         }
 
-        private void 关闭屏幕刷新(ExcelApp app)
+        private void 关闭屏幕刷新(Application app)
         {
             app.ScreenUpdating = false;
             app.Calculation = XlCalculation.xlCalculationManual;
-            shifang(app);
         }
 
         private void shifang(object obj)
         {
-            // 释放资源的具体实现
-            if (obj is IDisposable disposable)
+            if (obj == null) return;
+
+            try
             {
-                disposable.Dispose();
+                if (obj is Range range)
+                {
+                    Marshal.ReleaseComObject(range);
+                    range = null;
+                }
+                else if (obj is Worksheet sheet)
+                {
+                    shifang(sheet.UsedRange);
+                    Marshal.ReleaseComObject(sheet);
+                    sheet = null;
+                }
+                else if (obj is Application app)
+                {
+                    // 不建议在这里释放Application对象，可能导致Excel崩溃
+                    // Marshal.ReleaseComObject(app);
+                }
+                else if (obj is IDisposable disposable)
+                {
+                    disposable.Dispose();
+                }
+            }
+            catch (Exception ex)
+            {
+                LogError(ex, "释放COM对象异常");
             }
         }
     }

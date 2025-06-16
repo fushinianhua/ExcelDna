@@ -74,9 +74,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MyClass\EumemClass.cs" />
     <Compile Include="MyClass\ClassRemoveSheetPassword.cs" />
     <Compile Include="MyClass\ClassRemoveVbaPasswordBy32.cs" />
     <Compile Include="MyClass\ClassRemoveVbaPasswordBy64.cs" />
+    <Compile Include="MyClass\ExcelAppEvents.cs" />
+    <Compile Include="MyClass\InstanceManager.cs" />
+    <Compile Include="MyClass\ItemData.cs" />
     <Compile Include="MyClass\加密算法.cs" />
     <Compile Include="MyClass\公用.cs" />
     <Compile Include="Myform\名字输入.cs">
@@ -84,6 +88,12 @@
     </Compile>
     <Compile Include="Myform\名字输入.Designer.cs">
       <DependentUpon>名字输入.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Myform\数据对比.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Myform\数据对比.Designer.cs">
+      <DependentUpon>数据对比.cs</DependentUpon>
     </Compile>
     <Compile Include="Myform\条形码.cs">
       <SubType>Form</SubType>
@@ -117,6 +127,7 @@
     <EmbeddedResource Include="Myform\名字输入.resx">
       <DependentUpon>名字输入.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Myform\数据对比.resx" />
     <EmbeddedResource Include="Myform\条形码.resx">
       <DependentUpon>条形码.cs</DependentUpon>
     </EmbeddedResource>
@@ -141,6 +152,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="RibbonResources\统计计算.png" />
     <EmbeddedResource Include="RibbonResources\测试.png" />
     <EmbeddedResource Include="RibbonResources\联系人.png" />
     <EmbeddedResource Include="RibbonResources\停止.png" />

@@ -12,7 +12,7 @@ namespace Radiant.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.13.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.14.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -26,36 +26,48 @@ namespace Radiant.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string 注册码 {
+        public string 激活码 {
             get {
-                return ((string)(this["注册码"]));
+                return ((string)(this["激活码"]));
             }
             set {
-                this["注册码"] = value;
+                this["激活码"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool 注册状态 {
+        public bool 激活状态 {
             get {
-                return ((bool)(this["注册状态"]));
+                return ((bool)(this["激活状态"]));
             }
             set {
-                this["注册状态"] = value;
+                this["激活状态"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("20220778")]
+        [global::System.Configuration.DefaultSettingValueAttribute("21218308")]
         public string 密钥 {
             get {
                 return ((string)(this["密钥"]));
             }
             set {
                 this["密钥"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string 注册码 {
+            get {
+                return ((string)(this["注册码"]));
+            }
+            set {
+                this["注册码"] = value;
             }
         }
     }

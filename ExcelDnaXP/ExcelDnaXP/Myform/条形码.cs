@@ -9,8 +9,6 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using ZXing.QrCode;
 using ZXing;
-
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using ZXing.Common;
 using ExcelAPP = Microsoft.Office.Interop.Excel.Application;
 using Microsoft.Office.Interop.Excel;

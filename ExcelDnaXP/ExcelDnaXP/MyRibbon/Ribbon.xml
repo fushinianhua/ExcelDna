@@ -10,7 +10,7 @@
 				</group>
 				<!--数据的生成删除操作 -->
 				<group id="DataGruop" label="单元格操作">
-					<button id="CalculateButton" label="名字填充" onAction="计算Action" image="填充选择" size="large" getEnabled='GetButtonEnabled' />
+					<button id="CalculateButton" label="名字填充" onAction="计算Action" image="填充选择" size="large" getEnabled="GetButtonEnabled" />
 					<button id="InsertButton" label="隔行插入" onAction="InsertRange" image="插入行"  size="large" getEnabled='GetButtonEnabled' />
 				</group>
 				<!--文件操作-->
@@ -35,13 +35,19 @@
 						<button id="批量生成条形码" label="批量生成条形码" onAction="批量生成条形码"  image="二维码" screentip="批量生成条形码" />
 					</menu>
 				</group>
+				<group id="相同项Group" label="条形码">
+					<button id="相同项" label="相同项对比" onAction="相同项对比" image="条形码" screentip="两个表格查到相同项和不同项" getEnabled="GetButtonEnabled" />
+				</group>
 				<!-- 注册-->
 				<group id="注册Group" label="注册使用" autoScale="false">
 					<button id="注册" label="注册" onAction="注册" image="注册"  size="large"  screentip="注册完成后可以使用所有功能" />
 					<button id="取消注册" label="取消注册" onAction="取消注册" image="取消注册"  size="large"  screentip="注册完成后可以使用所有功能" />
 				</group>
+				<group id="数据统计Group" label="数据统计">
+					<button id="统计" label="统计" onAction="数据统计" image="统计计算" size="large" screentip="点击以后开始统计数据"  getEnabled="GetButtonEnabled" />
+				</group>
 				<group id="帮助Group" label="帮助">
-					<button id="帮助Button" label="关于" onAction="About" image="联系人"  size="large"  screentip="如有其他需求或者有使用中有什么问题请联系" />
+					<button id="帮助Button" label="关于" onAction="About" image="联系人"  size="large"   screentip="如有其他需求或者有使用中有什么问题请联系,联系方式:122312215413" />
 				</group>
 			</tab>
 		</tabs>
