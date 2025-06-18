@@ -89,6 +89,12 @@
     <Compile Include="Myform\名字输入.Designer.cs">
       <DependentUpon>名字输入.cs</DependentUpon>
     </Compile>
+    <Compile Include="Myform\图片导入设置.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Myform\图片导入设置.Designer.cs">
+      <DependentUpon>图片导入设置.cs</DependentUpon>
+    </Compile>
     <Compile Include="Myform\数据对比.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -127,7 +133,12 @@
     <EmbeddedResource Include="Myform\名字输入.resx">
       <DependentUpon>名字输入.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Myform\数据对比.resx" />
+    <EmbeddedResource Include="Myform\图片导入设置.resx">
+      <DependentUpon>图片导入设置.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Myform\数据对比.resx">
+      <DependentUpon>数据对比.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Myform\条形码.resx">
       <DependentUpon>条形码.cs</DependentUpon>
     </EmbeddedResource>
@@ -152,6 +163,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="RibbonResources\选择.png" />
     <EmbeddedResource Include="RibbonResources\统计计算.png" />
     <EmbeddedResource Include="RibbonResources\测试.png" />
     <EmbeddedResource Include="RibbonResources\联系人.png" />
@@ -162,14 +174,17 @@
     <EmbeddedResource Include="RibbonResources\二维码.png" />
     <EmbeddedResource Include="RibbonResources\删除批注 .png" />
     <EmbeddedResource Include="RibbonResources\破解密码.png" />
+    <EmbeddedResource Include="RibbonResources\图片.png" />
     <Content Include="RibbonResources\大写.png" />
     <EmbeddedResource Include="RibbonResources\开.png" />
     <EmbeddedResource Include="RibbonResources\添加批注.png" />
     <EmbeddedResource Include="RibbonResources\取消注册.png" />
     <Content Include="RibbonResources\拼音.png" />
-    <EmbeddedResource Include="RibbonResources\插入行.png" />
     <EmbeddedResource Include="RibbonResources\条形码.png" />
     <EmbeddedResource Include="RibbonResources\插入图片.png" />
+    <EmbeddedResource Include="RibbonResources\数据对比.png" />
+    <EmbeddedResource Include="RibbonResources\插入列.png" />
+    <EmbeddedResource Include="RibbonResources\插入行.png" />
     <Content Include="RibbonResources\电话.png" />
     <EmbeddedResource Include="RibbonResources\注册.png" />
   </ItemGroup>

@@ -11,15 +11,19 @@
 				<!--数据的生成删除操作 -->
 				<group id="DataGruop" label="单元格操作">
 					<button id="CalculateButton" label="名字填充" onAction="计算Action" image="填充选择" size="large" getEnabled="GetButtonEnabled" />
-					<button id="InsertButton" label="隔行插入" onAction="InsertRange" image="插入行"  size="large" getEnabled='GetButtonEnabled' />
+					<button id="InsertRowButton" label="隔行插入" onAction="InsertRowRange" image="插入行"  size="normal" getEnabled='GetButtonEnabled' />
+					<button id="InsertColButton" label="隔列插入" onAction="InsertColRange" image="插入列"  size="normal" getEnabled='GetButtonEnabled' />
 				</group>
 				<!--文件操作-->
 				<group id="WorkGroup" label="文件操作">
 					<menu id="批注" label="批注" image="添加批注" getEnabled="GetButtonEnabled">
-						<button id="插入图片" label="插入图片" onAction="插入图片"  image="插入图片"  screentip="插入图片" getEnabled="GetButtonEnabled" />
 						<button id="添加批注" label="添加批注" onAction="添加批注" image="添加批注" screentip="添加单个批注"  getEnabled='GetButtonEnabled' />
-						<button id="删除批注" label="删除批注" onAction="删除批注 "  image="删除批注 " />
-						<button id="删除所有批注" label="删除所有批注" onAction="删除所有批注" image="删除批注 " />
+						<button id="删除批注" label="删除批注" onAction="删除批注"  image="删除批注 " />
+						<button id="删除所有批注" label="删除所有批注" onAction="删除所有批注" image="删除批注" />
+					</menu>
+					<menu id="图片" label="图片" image="图片" getEnabled='GetButtonEnabled'>
+						<button id="插入图片" label="插入图片" onAction="插入图片"  image="插入图片"  screentip="插入图片" getEnabled="GetButtonEnabled" />
+						<button id="批量插入图片" label="批量插入图片" onAction="批量插入图片"  image="插入图片"  screentip="插入图片" getEnabled="GetButtonEnabled" />
 					</menu>
 					<menu id="密码" label="密码" image="破解密码" getEnabled='GetButtonEnabled'>
 						<!--<button id="破解excel文件" label="破解Excel文件" onAction="破解excel文件" image="Image1" screentip="清除文件密码" />-->
@@ -35,8 +39,8 @@
 						<button id="批量生成条形码" label="批量生成条形码" onAction="批量生成条形码"  image="二维码" screentip="批量生成条形码" />
 					</menu>
 				</group>
-				<group id="相同项Group" label="条形码">
-					<button id="相同项" label="相同项对比" onAction="相同项对比" image="条形码" screentip="两个表格查到相同项和不同项" getEnabled="GetButtonEnabled" />
+				<group id="相同项Group" label="相同项">
+					<button id="相同项" label="相同项对比" onAction="相同项对比" image="数据对比" screentip="两个表格查到相同项和不同项" getEnabled="GetButtonEnabled" />
 				</group>
 				<!-- 注册-->
 				<group id="注册Group" label="注册使用" autoScale="false">

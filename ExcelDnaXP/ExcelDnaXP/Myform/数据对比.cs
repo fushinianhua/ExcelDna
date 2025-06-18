@@ -42,8 +42,17 @@ namespace Radiant.MyForm
         // 对比结果键集合
         private HashSet<string> commonKeys;
 
+        // 区域一的键集合
         private HashSet<string> uniqueKeys1;
+
+        // 区域二的键集合
         private HashSet<string> uniqueKeys2;
+
+        // 相同项标识
+        private bool 相同项标识 = false;
+
+        // 不同项标识
+        private bool 不同项标识 = false;
 
         // 用于记录是否正在执行Excel操作
         private bool isProcessingExcel = false;
@@ -54,15 +63,6 @@ namespace Radiant.MyForm
             InitializeColorComboBox();
             excelapp = application;
         }
-
-        #region 窗体设计器生成的代码
-
-        // 此处省略窗体设计器生成的代码，实际应用中需要通过设计器创建控件
-        // 包括：pictureBox1, pictureBox2, 区域1Box, 区域2Box, 对比数据按钮,
-        // 相同项按钮, 不同项按钮, 清除标识按钮, 导出相同项按钮, 导出不同项按钮,
-        // 区域一Text, 区域二Text, 相同项Text 等控件
-
-        #endregion 窗体设计器生成的代码
 
         /// <summary>
         /// 初始化颜色选择下拉框
@@ -165,6 +165,7 @@ namespace Radiant.MyForm
         {
             try
             {
+                this.TopMost = false;
                 ShowWaitCursor();
                 BringExcelToFront();
                 this.Hide();
@@ -177,7 +178,7 @@ namespace Radiant.MyForm
 
                 if (result != null && result is Range selectedRange)
                 {
-                    区域一 = selectedRange;
+                    区域一 = GetEffectiveRange(selectedRange);
                     区域1Box.Text = BuildFullAddress(selectedRange);
                 }
                 this.Show();
@@ -200,6 +201,7 @@ namespace Radiant.MyForm
         {
             try
             {
+                this.TopMost = false;
                 ShowWaitCursor();
                 BringExcelToFront();
                 this.Hide();
@@ -212,7 +214,7 @@ namespace Radiant.MyForm
 
                 if (result != null && result is Range selectedRange)
                 {
-                    区域二 = selectedRange;
+                    区域二 = GetEffectiveRange(selectedRange);
                     区域2Box.Text = BuildFullAddress(selectedRange);
                 }
                 this.Show();
@@ -241,6 +243,28 @@ namespace Radiant.MyForm
             return $"[{workbookName}]{worksheetName}!{address}";
         }
 
+        // 获取所选区域中的有效数据区域
+        private Range GetEffectiveRange(Range selectedRange)
+        {
+            if (selectedRange == null) return null;
+
+            Worksheet worksheet = selectedRange.Worksheet;
+            Range usedRange = worksheet.UsedRange;
+
+            if (usedRange == null) return null;
+
+            try
+            {
+                // 计算所选区域与已使用区域的交集
+                return worksheet.Application.Intersect(selectedRange, usedRange);
+            }
+            catch
+            {
+                // 如果没有交集，返回null
+                return null;
+            }
+        }
+
         /// <summary>
         /// 对比数据按钮点击事件
         /// </summary>
@@ -248,6 +272,7 @@ namespace Radiant.MyForm
         {
             try
             {
+                this.TopMost = true;
                 ShowWaitCursor();
 
                 // 清空之前的结果
@@ -277,9 +302,9 @@ namespace Radiant.MyForm
                 var dict2 = BuildValueDictionary(data2, 区域二);
 
                 // 计算对比结果
-                commonKeys = new HashSet<string>(dict1.Keys.Intersect(dict2.Keys));
-                uniqueKeys1 = new HashSet<string>(dict1.Keys.Except(dict2.Keys));
-                uniqueKeys2 = new HashSet<string>(dict2.Keys.Except(dict1.Keys));
+                commonKeys = new HashSet<string>(dict1.Keys.Intersect(dict2.Keys));// 相同项
+                uniqueKeys1 = new HashSet<string>(dict1.Keys.Except(dict2.Keys));//区域一独有
+                uniqueKeys2 = new HashSet<string>(dict2.Keys.Except(dict1.Keys));//区域二独有
 
                 // 收集相同项区域
                 foreach (var key in commonKeys)
@@ -423,7 +448,7 @@ namespace Radiant.MyForm
             // 更新按钮状态 - 恢复原始逻辑
             不同项.Enabled = 导出不同项.Enabled = uniqueKeys1.Count > 0 || uniqueKeys2.Count > 0;
             相同项.Enabled = 导出相同项.Enabled = commonKeys.Count > 0;
-            清除标识.Enabled = 相同Rng.Count > 0 || 不同Rng.Count > 0;
+            清除标识.Enabled = 相同项标识 || 不同项标识;
 
             Debug.WriteLine($"相同项数量: {commonKeys.Count}");
             Debug.WriteLine($"区域一独有: {uniqueKeys1.Count}");
@@ -463,10 +488,10 @@ namespace Radiant.MyForm
                     if (combinedRange != null)
                     {
                         ws.Activate();
-                        combinedRange.Interior.Color = selectColor.Value.ToArgb();
+                        combinedRange.Interior.Color = selectColor;
                     }
                 }
-
+                清除标识.Enabled = true;
                 excelapp.ScreenUpdating = true;
                 excelapp.Calculation = XlCalculation.xlCalculationAutomatic;
             }
@@ -530,10 +555,10 @@ namespace Radiant.MyForm
                     if (combinedRange != null)
                     {
                         ws.Activate();
-                        combinedRange.Interior.Color = selectColor.Value.ToArgb();
+                        combinedRange.Interior.Color = selectColor;
                     }
                 }
-
+                清除标识.Enabled = true;
                 excelapp.ScreenUpdating = true;
                 excelapp.Calculation = XlCalculation.xlCalculationAutomatic;
             }
@@ -579,7 +604,7 @@ namespace Radiant.MyForm
                         combinedRange.Interior.Color = XlColorIndex.xlColorIndexNone;
                     }
                 }
-
+                相同项标识 = 不同项标识 = false;
                 excelapp.ScreenUpdating = true;
                 excelapp.Calculation = XlCalculation.xlCalculationAutomatic;
 
@@ -716,7 +741,7 @@ namespace Radiant.MyForm
             清除标识.Enabled = false;
             导出不同项.Enabled = false;
             导出相同项.Enabled = false;
-
+            this.TopMost = true;
             // 启用键盘快捷键
             KeyPreview = true;
             KeyDown += Form_KeyDown;
@@ -780,7 +805,6 @@ namespace Radiant.MyForm
         /// </summary>
         private void ShowWaitCursor()
         {
-            this.Cursor = Cursors.WaitCursor;
             isProcessingExcel = true;
         }
 
@@ -801,7 +825,7 @@ namespace Radiant.MyForm
             if (excelapp != null)
             {
                 IntPtr excelHandle = new IntPtr(excelapp.Hwnd);
-                SetForegroundWindow(excelHandle);
+                // SetForegroundWindow(excelHandle);
                 SwitchToThisWindow(excelHandle, true);
             }
         }
@@ -829,7 +853,6 @@ namespace Radiant.MyForm
         /// </summary>
         private void LogInformation(string message)
         {
-            Debug.WriteLine($"[INFO] {message}");
         }
 
         /// <summary>
@@ -837,7 +860,6 @@ namespace Radiant.MyForm
         /// </summary>
         private void LogWarning(string message)
         {
-            Debug.WriteLine($"[WARNING] {message}");
         }
 
         /// <summary>
@@ -845,8 +867,6 @@ namespace Radiant.MyForm
         /// </summary>
         private void LogException(string message, Exception ex)
         {
-            Debug.WriteLine($"[ERROR] {message}: {ex.Message}");
-            Debug.WriteLine($"[STACK TRACE] {ex.StackTrace}");
         }
     }
 }

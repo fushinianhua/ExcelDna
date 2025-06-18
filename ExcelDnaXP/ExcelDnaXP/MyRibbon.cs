@@ -43,7 +43,7 @@ namespace Radiant
             new Dictionary<string, (string 开图片, string 关图片)>()
             {
                 ["TestButton"] = ("开.png", "关.png"),
-                ["button2"] = ("运行.png", "停止.png")
+                //  ["button2"] = ("运行.png", "停止.png")
             };
 
         /// <summary>
@@ -57,7 +57,8 @@ namespace Radiant
             "密码",
             "条码Menu",
             "MainMenu",
-            "统计"
+            "统计",
+            "相同项"
         };
 
         /// <summary>
@@ -110,7 +111,6 @@ namespace Radiant
                 bool falg = savedState &&
                            (!string.IsNullOrEmpty(savedCode) &&
                             (savedCode == machineCode || savedCode == 加密算法.密钥));
-
                 // 显示调试信息
                 //MessageBox.Show($"机器码: {machineCode}\n" +
                 //              $"激活码: {activationCode}\n" +
@@ -399,24 +399,47 @@ namespace Radiant
             MessageBox.Show("Hello!");
         }
 
-        public void InsertRange(IRibbonControl control)
+        public void InsertRowRange(IRibbonControl control)//插入行
         {
             Worksheet sheet = _excelApp.ActiveSheet;
             Range selectRng = _excelApp.Selection;
             try
             {
-                int count = selectRng.Rows.Count;
-                if (count == 1)
+                int Rowcount = selectRng.Rows.Count;
+                if (selectRng == null || Rowcount == 1)
                 {
-                    Range rng = selectRng.Insert(XlInsertShiftDirection.xlShiftDown);
                     return;
                 }
-                int lastRow = selectRng.Row + count;
+                // 显示输入框获取插入行数
+                object result = _excelApp.InputBox(
+                    Prompt: "请输入插入行数",
+                    Title: "插入行数",
+                    Default: "1",
+                    Type: 1);
+                // 处理用户点击取消的情况
+                if (result == null || result is bool v && !v || !(result is double))
+                {
+                    MessageBox.Show("输入无效，请输入数字", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return; // 用户取消操作
+                }
+                // 安全转换为整数
+
+                double doubleValue = (double)result;
+                // 四舍五入转换为整数
+                int insertCount = (int)Math.Round(doubleValue, MidpointRounding.AwayFromZero);
+                // 验证数值范围
+                if (insertCount < 1 || insertCount > int.MaxValue)
+                {
+                    MessageBox.Show($"请输入1到{int.MaxValue}之间的整数", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                int lastRow = selectRng.Row + Rowcount - 1;
                 int startRow = selectRng.Row;
                 for (int i = lastRow; i > startRow; i--)
                 {
                     Range newRow = sheet.Rows[i];
-                    newRow.Insert(XlInsertShiftDirection.xlShiftDown);
+                    // 一次性插入指定数量的空白行
+                    newRow.Resize[insertCount].Insert(XlInsertShiftDirection.xlShiftDown);
                 }
             }
             catch (Exception ex)
@@ -427,6 +450,114 @@ namespace Radiant
             {
                 shifang(sheet);
                 shifang(selectRng);
+            }
+        }
+
+        public void InsertColRange(IRibbonControl control)
+        {
+            Worksheet worksheet = _excelApp.ActiveSheet;
+            Range selectRng = _excelApp.Selection;
+
+            try
+            {
+                // 检查选择区域是否有效
+                if (selectRng == null || selectRng.Columns.Count < 2)
+                {
+                    MessageBox.Show("请至少选择两列进行操作", "提示",
+                                   MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                // 获取用户输入的插入列数
+                object result = _excelApp.InputBox(
+                    Prompt: "请输入每列右侧插入的列数 (1-100)",
+                    Title: "插入列",
+                    Default: "1",
+                    Type: 1);
+
+                // 处理用户取消操作
+                if (result == null || (result is bool boolResult && !boolResult))
+                {
+                    return; // 用户取消
+                }
+
+                // 增强输入验证
+                if (!(result is double) && !double.TryParse(result.ToString(), out double temp))
+                {
+                    MessageBox.Show("输入无效，请输入一个数字", "错误",
+                                   MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                double doubleValue = result is double ? (double)result : double.Parse(result.ToString());
+
+                // 添加合理的数值范围限制
+                const int maxInsertCount = 100;
+                if (doubleValue < 1 || doubleValue > maxInsertCount)
+                {
+                    MessageBox.Show($"请输入1到{maxInsertCount}之间的数字", "错误",
+                                   MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // 四舍五入转换为整数
+                int insertColumnCount = (int)Math.Round(doubleValue, MidpointRounding.AwayFromZero);
+
+                // 关闭屏幕刷新
+                关闭屏幕刷新(_excelApp);
+
+                // 获取选择区域的列信息
+                int selectedColsCount = selectRng.Columns.Count;
+                int startColumn = selectRng.Column;
+                int lastColumn = startColumn + selectedColsCount - 1;
+
+                // 从最后一列开始处理，避免插入列后索引变化
+                for (int i = lastColumn; i >= startColumn; i--)
+                {
+                    // 获取当前列的下一列作为插入点
+                    Range insertPos = worksheet.Columns[i + 1];
+
+                    try
+                    {
+                        // 正确的方式：插入整列区域
+                        insertPos.Resize[ColumnSize: insertColumnCount].Insert(XlInsertShiftDirection.xlShiftToRight);
+                    }
+                    finally
+                    {
+                        // 确保释放临时创建的Range对象
+                        shifang(insertPos);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"操作失败: {ex.Message}\n{ex.StackTrace}", "错误",
+                               MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                // 恢复Excel设置
+                if (_excelApp != null)
+                {
+                    开启屏幕刷新(_excelApp);
+                }
+
+                // 释放COM对象
+                shifang(selectRng);
+                shifang(worksheet);
+            }
+        }//插入列
+
+        public void 批量插入图片(IRibbonControl control)
+        {
+            try
+            {
+                图片导入设置 设置 = new 图片导入设置(_excelApp);
+                设置.Show();
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
 
@@ -575,7 +706,7 @@ namespace Radiant
             }
         }
 
-        // 合并三个方法为一个通用方法
+        //显示条形码界面
         private void ShowBarcodeForm(公用.BarType barType, bool isBatch = false)
         {
             try
@@ -630,49 +761,93 @@ namespace Radiant
 
         public void 删除批注(IRibbonControl control)
         {
-            Range rng = _excelApp.Selection;
+            Application excel = _excelApp;
+            if (excel == null) return;
+
+            Worksheet ws = excel.ActiveSheet;
+            if (ws == null) return;
+
+            Range selection = excel.Selection;
+            if (selection == null) return;
+
             try
             {
-                if (rng.Comment != null)
+                // 检查工作表保护
+                if (ws.ProtectContents)
                 {
-                    rng.Comment.Delete();
+                    MessageBox.Show("工作表受保护，无法删除批注", "警告",
+                                   MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
                 }
+                foreach (Range cell in selection)
+                {
+                    if (cell.Comment != null)
+                    {
+                        cell.Comment.Delete();
+                    }
+                }
+                // 显示操作结果
+                MessageBox.Show("已删除选中区域内所有批注!", "操作完成",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                MessageBox.Show($"删除批注失败: {ex.Message}", "错误",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
-                shifang(rng);
+                // 恢复Excel设置
+                excel.ScreenUpdating = true;
+                excel.EnableEvents = true;
+
+                // 释放COM对象
+                shifang(selection);
+                shifang(ws);
             }
         }
 
         public void 删除所有批注(IRibbonControl control)
         {
-            Worksheet worksheet = _excelApp.ActiveSheet;
-            Range rng = worksheet.UsedRange;
+            Application excel = _excelApp;
+            if (excel == null) return;
+            Worksheet worksheet = excel.ActiveSheet;
+            if (worksheet == null) return;
+            关闭屏幕刷新(excel);
             try
             {
-                Task.Run(() =>
+                // 方法1: 使用SpecialCells快速定位批注（最推荐）
+                try
                 {
-                    foreach (Range cell in rng)
+                    Range commentsRange = worksheet.Cells.SpecialCells(
+                        XlCellType.xlCellTypeComments);
+
+                    if (commentsRange != null)
                     {
-                        if (cell.Comment != null)
-                        {
-                            cell.Comment.Delete();
-                        }
+                        // 一次性删除所有批注
+                        commentsRange.ClearComments();
+                        shifang(commentsRange);
                     }
-                });
-            }
-            catch (Exception)
-            {
-                throw;
+                }
+                catch (COMException ex) when (ex.ErrorCode == -2146827284) // 0x800A03EC
+                {
+                    // 找不到批注时忽略错误
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"删除批注时出错: {ex.Message}", "错误",
+                                   MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                Range usedRange = worksheet.UsedRange; // 方法2: 备用方案（当SpecialCells失败时使用）
+                if (usedRange != null)
+                {
+                    usedRange.ClearComments();   // 直接清除整个区域的批注（效率更高）
+                }
             }
             finally
             {
-                shifang(worksheet);
-                shifang(rng);
+                开启屏幕刷新(excel);  // 恢复屏幕刷新
+                shifang(worksheet);         // 释放COM对象
             }
         }
 
@@ -823,12 +998,15 @@ namespace Radiant
                 if (正常离职列表.Count > 0)
                 {
                     range = worksheet.Cells[32, 源列];
+                    range.Comment?.Delete();
+
                     range.AddComment(正常离职列表字符串);
                 }
 
                 if (自离列表.Count > 0)
                 {
                     range = worksheet.Cells[33, 源列];
+                    range.Comment?.Delete();
                     range.AddComment(自离列表字符串);
                 }
 

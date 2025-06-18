@@ -49,3 +49,4 @@ D:\Github_project\ExcelDna\ExcelDnaXP\ExcelDnaXP\obj\Debug\Radiant.csproj.CoreCo
 D:\Github_project\ExcelDna\ExcelDnaXP\ExcelDnaXP\obj\Debug\Radiant.csproj.Up2Date
 D:\Github_project\ExcelDna\ExcelDnaXP\ExcelDnaXP\obj\Debug\Radiant.dll
 D:\Github_project\ExcelDna\ExcelDnaXP\ExcelDnaXP\obj\Debug\Radiant.pdb
+D:\Github_project\ExcelDna\ExcelDnaXP\ExcelDnaXP\obj\Debug\Radiant.Myform.图片导入设置.resources
