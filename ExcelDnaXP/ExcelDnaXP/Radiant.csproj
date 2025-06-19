@@ -74,7 +74,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MyClass\EumemClass.cs" />
+    <Compile Include="MyClass\GlobalEnum.cs" />
     <Compile Include="MyClass\ClassRemoveSheetPassword.cs" />
     <Compile Include="MyClass\ClassRemoveVbaPasswordBy32.cs" />
     <Compile Include="MyClass\ClassRemoveVbaPasswordBy64.cs" />
