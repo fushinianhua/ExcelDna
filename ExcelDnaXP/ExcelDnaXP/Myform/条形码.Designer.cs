@@ -37,6 +37,8 @@
             this.button1 = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.前缀Text = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -91,10 +93,10 @@
             // textBox1
             // 
             this.textBox1.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.textBox1.Location = new System.Drawing.Point(117, 30);
+            this.textBox1.Location = new System.Drawing.Point(217, 30);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(306, 32);
+            this.textBox1.Size = new System.Drawing.Size(200, 32);
             this.textBox1.TabIndex = 14;
             this.textBox1.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
@@ -103,13 +105,13 @@
             this.pictureBox1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.pictureBox1.Location = new System.Drawing.Point(15, 85);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(300, 300);
+            this.pictureBox1.Size = new System.Drawing.Size(302, 302);
             this.pictureBox1.TabIndex = 17;
             this.pictureBox1.TabStop = false;
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(453, 32);
+            this.button1.Location = new System.Drawing.Point(483, 32);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(62, 32);
             this.button1.TabIndex = 16;
@@ -120,7 +122,7 @@
             // label1
             // 
             this.label1.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label1.Location = new System.Drawing.Point(12, 30);
+            this.label1.Location = new System.Drawing.Point(112, 30);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(99, 32);
             this.label1.TabIndex = 15;
@@ -138,11 +140,34 @@
             this.label3.Text = "当前显示生成位置:";
             this.label3.Visible = false;
             // 
+            // label4
+            // 
+            this.label4.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label4.Location = new System.Drawing.Point(12, 30);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(45, 30);
+            this.label4.TabIndex = 23;
+            this.label4.Text = "前缀";
+            this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // 前缀Text
+            // 
+            this.前缀Text.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.前缀Text.Location = new System.Drawing.Point(53, 30);
+            this.前缀Text.Multiline = true;
+            this.前缀Text.Name = "前缀Text";
+            this.前缀Text.Size = new System.Drawing.Size(48, 30);
+            this.前缀Text.TabIndex = 24;
+            this.前缀Text.Text = "82";
+            this.前缀Text.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
             // 条形码
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(570, 399);
+            this.Controls.Add(this.前缀Text);
+            this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.SelectCom);
@@ -178,5 +203,7 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.TextBox 前缀Text;
     }
 }

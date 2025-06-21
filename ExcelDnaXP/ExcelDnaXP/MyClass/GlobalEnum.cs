@@ -93,6 +93,8 @@ namespace Radiant.MyClass
             public double 左边距 { get; set; }
             public double 下边距 { get; set; } = 0;
             public double 右边距 { get; set; } = 0;
+            public double 旋转角度 { get; set; } = 0;
+            public double 缩放比例 { get; set; } = 0.55;
         }
     }
 }

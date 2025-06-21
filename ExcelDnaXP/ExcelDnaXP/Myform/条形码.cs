@@ -329,7 +329,7 @@ namespace Radiant.Myform
                 // 假设 bartype 是一个 ComboBox，并且其 SelectedItem 可以转换为 BarcodeFormat
                 if (Enum.TryParse(bartype.ToString(), out BarcodeFormat barcodeFormat))
                 {
-                    GenerateBarcode(bartext, barcodeFormat, pictureBox1.Width, pictureBox1.Height);
+                    GenerateBarcode(前缀Text + bartext, barcodeFormat, pictureBox1.Width, pictureBox1.Height);
                 }
                 else
                 {

@@ -138,18 +138,18 @@ namespace Radiant.Myform
             double left;
             double height;
             double width;
-            //  double left = targetRange.Left + _options.LeftPadding;
-            //  double top = targetRange.Top + _options.TopPadding;
+            double RangeTop = targetRange.Top;
+            double RangeLeft = targetRange.Left;
             if (_IsCosutom)
             {
                 width = Convert.ToDouble(WidthText.Text) * 单位;
                 height = Convert.ToDouble(HeightText.Text) * 单位;
-                left = Convert.ToDouble(TopText.Text) * 单位;
-                top = Convert.ToDouble(LeftText.Text) * 单位;
+                left = RangeLeft + Convert.ToDouble(LeftText.Text);
+                top = RangeTop + Convert.ToDouble(LeftText.Text);
             }
             if (_options.FillStyle == FillStyle.图片大小填充)
             {
-                (height, width) = GetImagePixels(imagePath);
+                (width, height) = GetImagePixels(imagePath);
                 left = -1;
                 top = -1;
             }
