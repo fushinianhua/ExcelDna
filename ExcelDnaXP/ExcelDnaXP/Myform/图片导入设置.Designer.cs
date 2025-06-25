@@ -55,11 +55,12 @@
             this.LeftToRingt = new System.Windows.Forms.RadioButton();
             this.label2 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.radioButton3 = new System.Windows.Forms.RadioButton();
-            this.radioButton2 = new System.Windows.Forms.RadioButton();
+            this.自定义大小 = new System.Windows.Forms.RadioButton();
+            this.RangeSize = new System.Windows.Forms.RadioButton();
+            this.ImageSize = new System.Windows.Forms.RadioButton();
             this.label1 = new System.Windows.Forms.Label();
             this.导入 = new System.Windows.Forms.Button();
-            this.自定义大小 = new System.Windows.Forms.RadioButton();
+            this.TileLabel = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox6.SuspendLayout();
             this.groupBox5.SuspendLayout();
@@ -342,8 +343,8 @@
             // groupBox2
             // 
             this.groupBox2.Controls.Add(this.自定义大小);
-            this.groupBox2.Controls.Add(this.radioButton3);
-            this.groupBox2.Controls.Add(this.radioButton2);
+            this.groupBox2.Controls.Add(this.RangeSize);
+            this.groupBox2.Controls.Add(this.ImageSize);
             this.groupBox2.Controls.Add(this.label1);
             this.groupBox2.Location = new System.Drawing.Point(11, 19);
             this.groupBox2.Name = "groupBox2";
@@ -351,28 +352,39 @@
             this.groupBox2.TabIndex = 4;
             this.groupBox2.TabStop = false;
             // 
-            // radioButton3
+            // 自定义大小
             // 
-            this.radioButton3.AutoSize = true;
-            this.radioButton3.Location = new System.Drawing.Point(235, 20);
-            this.radioButton3.Name = "radioButton3";
-            this.radioButton3.Size = new System.Drawing.Size(119, 16);
-            this.radioButton3.TabIndex = 8;
-            this.radioButton3.Text = "以单元格大小填充";
-            this.radioButton3.UseVisualStyleBackColor = true;
+            this.自定义大小.AutoSize = true;
+            this.自定义大小.Location = new System.Drawing.Point(382, 20);
+            this.自定义大小.Name = "自定义大小";
+            this.自定义大小.Size = new System.Drawing.Size(83, 16);
+            this.自定义大小.TabIndex = 9;
+            this.自定义大小.Text = "自定义大小";
+            this.自定义大小.UseVisualStyleBackColor = true;
+            this.自定义大小.CheckedChanged += new System.EventHandler(this.自定义大小_CheckedChanged);
             // 
-            // radioButton2
+            // RangeSize
             // 
-            this.radioButton2.AutoSize = true;
-            this.radioButton2.Checked = true;
-            this.radioButton2.Location = new System.Drawing.Point(113, 20);
-            this.radioButton2.Name = "radioButton2";
-            this.radioButton2.Size = new System.Drawing.Size(107, 16);
-            this.radioButton2.TabIndex = 7;
-            this.radioButton2.TabStop = true;
-            this.radioButton2.Text = "以图片大小填充";
-            this.radioButton2.UseVisualStyleBackColor = true;
-            this.radioButton2.CheckedChanged += new System.EventHandler(this.radioButton2_CheckedChanged);
+            this.RangeSize.AutoSize = true;
+            this.RangeSize.Location = new System.Drawing.Point(235, 20);
+            this.RangeSize.Name = "RangeSize";
+            this.RangeSize.Size = new System.Drawing.Size(95, 16);
+            this.RangeSize.TabIndex = 8;
+            this.RangeSize.Text = "以单元格填充";
+            this.RangeSize.UseVisualStyleBackColor = true;
+            // 
+            // ImageSize
+            // 
+            this.ImageSize.AutoSize = true;
+            this.ImageSize.Checked = true;
+            this.ImageSize.Location = new System.Drawing.Point(113, 20);
+            this.ImageSize.Name = "ImageSize";
+            this.ImageSize.Size = new System.Drawing.Size(83, 16);
+            this.ImageSize.TabIndex = 7;
+            this.ImageSize.TabStop = true;
+            this.ImageSize.Text = "以图片填充";
+            this.ImageSize.UseVisualStyleBackColor = true;
+            this.ImageSize.CheckedChanged += new System.EventHandler(this.RadioButton2_CheckedChanged);
             // 
             // label1
             // 
@@ -394,27 +406,27 @@
             this.导入.UseVisualStyleBackColor = true;
             this.导入.Click += new System.EventHandler(this.导入_Click);
             // 
-            // 自定义大小
+            // TileLabel
             // 
-            this.自定义大小.AutoSize = true;
-            this.自定义大小.Location = new System.Drawing.Point(382, 20);
-            this.自定义大小.Name = "自定义大小";
-            this.自定义大小.Size = new System.Drawing.Size(83, 16);
-            this.自定义大小.TabIndex = 9;
-            this.自定义大小.Text = "自定义大小";
-            this.自定义大小.UseVisualStyleBackColor = true;
-            this.自定义大小.CheckedChanged += new System.EventHandler(this.自定义大小_CheckedChanged);
+            this.TileLabel.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.TileLabel.Location = new System.Drawing.Point(63, 23);
+            this.TileLabel.Name = "TileLabel";
+            this.TileLabel.Size = new System.Drawing.Size(521, 29);
+            this.TileLabel.TabIndex = 4;
+            this.TileLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // 图片导入设置
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(637, 527);
+            this.Controls.Add(this.TileLabel);
             this.Controls.Add(this.导入);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.浏览文件But);
             this.Name = "图片导入设置";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "图片导入设置";
             this.groupBox1.ResumeLayout(false);
             this.groupBox6.ResumeLayout(false);
@@ -439,7 +451,7 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Button 导入;
         private System.Windows.Forms.GroupBox groupBox2;
-        private System.Windows.Forms.RadioButton radioButton2;
+        private System.Windows.Forms.RadioButton ImageSize;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.GroupBox groupBox5;
         private System.Windows.Forms.RadioButton 压缩N;
@@ -451,7 +463,7 @@
         private System.Windows.Forms.RadioButton UpToDown;
         private System.Windows.Forms.RadioButton LeftToRingt;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.RadioButton radioButton3;
+        private System.Windows.Forms.RadioButton RangeSize;
         private System.Windows.Forms.TextBox TopText;
         private System.Windows.Forms.TextBox WidthText;
         private System.Windows.Forms.Label Lable10;
@@ -466,5 +478,6 @@
         private System.Windows.Forms.RadioButton 不改变位置大小;
         private System.Windows.Forms.RadioButton 只改变位置;
         private System.Windows.Forms.RadioButton 自定义大小;
+        private System.Windows.Forms.Label TileLabel;
     }
 }

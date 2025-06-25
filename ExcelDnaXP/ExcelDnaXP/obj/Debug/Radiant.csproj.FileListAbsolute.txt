@@ -40,7 +40,8 @@ D:\Github_project\ExcelDna\ExcelDnaXP\ExcelDnaXP\bin\Debug\zxing.xml
 D:\Github_project\ExcelDna\ExcelDnaXP\ExcelDnaXP\bin\Debug\zxing.presentation.xml
 D:\Github_project\ExcelDna\ExcelDnaXP\ExcelDnaXP\obj\Debug\Radiant.csproj.AssemblyReference.cache
 D:\Github_project\ExcelDna\ExcelDnaXP\ExcelDnaXP\obj\Debug\Radiant.Myform.名字输入.resources
-D:\Github_project\ExcelDna\ExcelDnaXP\ExcelDnaXP\obj\Debug\Radiant.Myform.数据对比.resources
+D:\Github_project\ExcelDna\ExcelDnaXP\ExcelDnaXP\obj\Debug\Radiant.Myform.图片导入设置.resources
+D:\Github_project\ExcelDna\ExcelDnaXP\ExcelDnaXP\obj\Debug\Radiant.MyForm.数据对比.resources
 D:\Github_project\ExcelDna\ExcelDnaXP\ExcelDnaXP\obj\Debug\Radiant.Myform.条形码.resources
 D:\Github_project\ExcelDna\ExcelDnaXP\ExcelDnaXP\obj\Debug\ExcelDnaXP.Myform.注册界面.resources
 D:\Github_project\ExcelDna\ExcelDnaXP\ExcelDnaXP\obj\Debug\Radiant.Properties.Resources.resources
@@ -49,4 +50,7 @@ D:\Github_project\ExcelDna\ExcelDnaXP\ExcelDnaXP\obj\Debug\Radiant.csproj.CoreCo
 D:\Github_project\ExcelDna\ExcelDnaXP\ExcelDnaXP\obj\Debug\Radiant.csproj.Up2Date
 D:\Github_project\ExcelDna\ExcelDnaXP\ExcelDnaXP\obj\Debug\Radiant.dll
 D:\Github_project\ExcelDna\ExcelDnaXP\ExcelDnaXP\obj\Debug\Radiant.pdb
-D:\Github_project\ExcelDna\ExcelDnaXP\ExcelDnaXP\obj\Debug\Radiant.Myform.图片导入设置.resources
+D:\Github_project\ExcelDna\ExcelDnaXP\ExcelDnaXP\bin\Debug\HtmlAgilityPack.dll
+D:\Github_project\ExcelDna\ExcelDnaXP\ExcelDnaXP\bin\Debug\HtmlAgilityPack.pdb
+D:\Github_project\ExcelDna\ExcelDnaXP\ExcelDnaXP\bin\Debug\HtmlAgilityPack.xml
+D:\Github_project\ExcelDna\ExcelDnaXP\ExcelDnaXP\obj\Debug\Radiant.Myform.网页.resources

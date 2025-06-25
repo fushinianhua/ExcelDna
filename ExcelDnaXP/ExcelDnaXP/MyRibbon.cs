@@ -1,6 +1,7 @@
 ﻿using ExcelDna.Integration;
 using ExcelDna.Integration.CustomUI;
 using ExcelDnaXP.Myform;
+using HtmlAgilityPack;
 using Microsoft.Office.Interop.Excel;
 using Microsoft.SqlServer.Server;
 using Radiant.MyCalss;
@@ -11,13 +12,18 @@ using Radiant.Properties;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml;
 using Application = Microsoft.Office.Interop.Excel.Application;
+using HtmlDocument = HtmlAgilityPack.HtmlDocument;
 
 namespace Radiant
 {
@@ -35,6 +41,7 @@ namespace Radiant
         private ExcelAppEvents _appEvents;
         private bool _isRunning = false;
         private 条形码 _BarcodeForm = null;
+        private bool savedState;
 
         /// <summary>
         /// 按钮图片 第一个为按钮ID ,第二个为图片资源
@@ -51,14 +58,18 @@ namespace Radiant
         /// </summary>
         private readonly List<string> _protectedButtons = new List<string>
         {
+            "PasswordMenu",
+            "InsertRowButton",
+            "InsertColButton",
+            "CommentMenu",
             "CalculateButton",
-            "批注",
-            "InsertButton",
-            "密码",
-            "条码Menu",
-            "MainMenu",
-            "统计",
-            "相同项"
+            "SameItemButton",
+            "StatisticsButton",
+            "ImageMenu",
+            "BarcodeMenu",
+            "RegisterButton",
+            "UnregisterButton",
+            "HelpButton"
         };
 
         /// <summary>
@@ -102,7 +113,7 @@ namespace Radiant
 
                 string machineCode = 加密算法.注册码;
                 string savedCode = Settings.Default.注册码;
-                bool savedState = Settings.Default.激活状态;
+                savedState = Settings.Default.激活状态;
 
                 // 生成当前机器码对应的激活码
                 string activationCode = 加密算法.EncryptAndFormat(加密算法.CPUID);
@@ -134,7 +145,7 @@ namespace Radiant
         /// </summary>
         public bool GetButtonEnabled(IRibbonControl control)
         {
-            bool falg = _protectedButtons.Contains(control.Id) ? CurrentInstanceState.IsRegistered : true;
+            bool falg = !_protectedButtons.Contains(control.Id) || CurrentInstanceState.IsRegistered;
             return falg;
         }
 
@@ -266,7 +277,7 @@ namespace Radiant
             }
             finally
             {
-                shifang(sheet);
+                Shifang(sheet);
             }
         }
 
@@ -301,8 +312,8 @@ namespace Radiant
                     range.Resize[count, 1].Value2 = value;
                 }
 
-                shifang(_excelApp);
-                shifang(sheet);
+                Shifang(_excelApp);
+                Shifang(sheet);
             }
             catch (Exception ex)
             {
@@ -310,6 +321,12 @@ namespace Radiant
             }
         }
 
+        /// <summary>
+        /// 获取开始的行数
+        /// </summary>
+        /// <param name="sheet"></param>
+        /// <param name="col"></param>
+        /// <returns></returns>
         private int GetStartRow(Worksheet sheet, int col)
         {
             Range r = sheet.Cells[sheet.Rows.Count, col];
@@ -324,8 +341,7 @@ namespace Radiant
             {
                 Range valuerng = sheet.Range[sheet.Cells[startRow - 1, col], sheet.Cells[startRow - 200, col]];
                 List<string> names = new List<string>();
-                object[,] values = valuerng.Value2 as object[,];
-                if (values != null)
+                if (valuerng.Value2 is object[,] values)
                 {
                     for (int i = 1; i <= values.GetLength(0); i++)
                     {
@@ -448,8 +464,8 @@ namespace Radiant
             }
             finally
             {
-                shifang(sheet);
-                shifang(selectRng);
+                Shifang(sheet);
+                Shifang(selectRng);
             }
         }
 
@@ -489,7 +505,7 @@ namespace Radiant
                     return;
                 }
 
-                double doubleValue = result is double ? (double)result : double.Parse(result.ToString());
+                double doubleValue = result is double v ? v : double.Parse(result.ToString());
 
                 // 添加合理的数值范围限制
                 const int maxInsertCount = 100;
@@ -525,7 +541,7 @@ namespace Radiant
                     finally
                     {
                         // 确保释放临时创建的Range对象
-                        shifang(insertPos);
+                        Shifang(insertPos);
                     }
                 }
             }
@@ -543,8 +559,8 @@ namespace Radiant
                 }
 
                 // 释放COM对象
-                shifang(selectRng);
-                shifang(worksheet);
+                Shifang(selectRng);
+                Shifang(worksheet);
             }
         }//插入列
 
@@ -682,7 +698,21 @@ namespace Radiant
             }
         }
 
-        public void 生成二维码(IRibbonControl control)
+        public void 打开网页(IRibbonControl control)
+        {
+            try
+            {
+                网页 打开网页 = new 网页();
+                打开网页.url = "Https://www.baidu.com";
+                打开网页.Show();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public void 生成二维码()
         {
             try
             {
@@ -706,22 +736,29 @@ namespace Radiant
             }
         }
 
-        //显示条形码界面
+        /// <summary>
+        /// 显示条形码界面
+        /// </summary>
+        /// <param name="barType"></param>
+        /// <param name="isBatch"></param>
         private void ShowBarcodeForm(公用.BarType barType, bool isBatch = false)
         {
             try
             {
-                // 检查当前窗体是否存在，如果存在则关闭它
+                // 如果窗体已存在且未释放
                 if (_BarcodeForm != null && !_BarcodeForm.IsDisposed)
                 {
-                    // 可以选择提示用户，或直接关闭
-                    _BarcodeForm.Close();
+                    // 显示并激活现有窗体
+                    _BarcodeForm.Show();
+                    _BarcodeForm.Activate();  // 确保窗体获得焦点
+                    _BarcodeForm.WindowState = FormWindowState.Normal; // 如果最小化则恢复正常状态
+                    return; // 直接返回，不执行后续创建代码
                 }
 
                 // 创建新窗体实例
                 _BarcodeForm = new 条形码(barType, _excelApp, isBatch);
 
-                // 设置窗体关闭时的事件处理，将引用置为null
+                // 设置窗体关闭时的事件处理
                 _BarcodeForm.FormClosed += (sender, e) => _BarcodeForm = null;
 
                 // 显示窗体
@@ -755,7 +792,7 @@ namespace Radiant
             finally
             {
                 开启屏幕刷新(_excelApp);
-                shifang(selectRng);
+                Shifang(selectRng);
             }
         }
 
@@ -781,10 +818,7 @@ namespace Radiant
                 }
                 foreach (Range cell in selection)
                 {
-                    if (cell.Comment != null)
-                    {
-                        cell.Comment.Delete();
-                    }
+                    cell.Comment?.Delete();
                 }
                 // 显示操作结果
                 MessageBox.Show("已删除选中区域内所有批注!", "操作完成",
@@ -802,8 +836,8 @@ namespace Radiant
                 excel.EnableEvents = true;
 
                 // 释放COM对象
-                shifang(selection);
-                shifang(ws);
+                Shifang(selection);
+                Shifang(ws);
             }
         }
 
@@ -826,7 +860,7 @@ namespace Radiant
                     {
                         // 一次性删除所有批注
                         commentsRange.ClearComments();
-                        shifang(commentsRange);
+                        Shifang(commentsRange);
                     }
                 }
                 catch (COMException ex) when (ex.ErrorCode == -2146827284) // 0x800A03EC
@@ -839,15 +873,12 @@ namespace Radiant
                                    MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 Range usedRange = worksheet.UsedRange; // 方法2: 备用方案（当SpecialCells失败时使用）
-                if (usedRange != null)
-                {
-                    usedRange.ClearComments();   // 直接清除整个区域的批注（效率更高）
-                }
+                usedRange?.ClearComments();   // 直接清除整个区域的批注（效率更高）
             }
             finally
             {
                 开启屏幕刷新(excel);  // 恢复屏幕刷新
-                shifang(worksheet);         // 释放COM对象
+                Shifang(worksheet);         // 释放COM对象
             }
         }
 
@@ -920,9 +951,8 @@ namespace Radiant
                 List<Range> ranges = new List<Range>();
                 foreach (Range cell in rng3.Cells)
                 {
-                    int number;
                     if (cell.Value2 == null) { continue; }
-                    if (!int.TryParse(cell.Value.ToString(), out number))
+                    if (!int.TryParse(cell.Value.ToString(), out int number))
                     {
                         ranges.Add(cell);
                     }
@@ -958,7 +988,7 @@ namespace Radiant
                                     int row = cell.Row;
                                     Range r = sheetdata.Cells[row, 3];
                                     正常离职列表.Add(r.Value);
-                                    shifang(r);
+                                    Shifang(r);
                                 }
                                 break;
 
@@ -969,7 +999,7 @@ namespace Radiant
                                     int row = cell.Row;
                                     Range r = sheetdata.Cells[row, 3];
                                     自离列表.Add(r.Value);
-                                    shifang(r);
+                                    Shifang(r);
                                 }
                                 break;
 
@@ -989,7 +1019,7 @@ namespace Radiant
                     Range r = worksheet.Cells[item.Row, 源列];
                     if (item.Count > 0)
                         r.Value2 = item.Count;
-                    shifang(r);
+                    Shifang(r);
                 }
                 // 将 List 内容用换行符连接
                 string 正常离职列表字符串 = string.Join(Environment.NewLine, 正常离职列表);
@@ -1010,7 +1040,7 @@ namespace Radiant
                     range.AddComment(自离列表字符串);
                 }
 
-                shifang(range);
+                Shifang(range);
                 // 确保CountAll不为零，防止除零错误
                 if (CountAll <= 0)
                 {
@@ -1095,9 +1125,9 @@ namespace Radiant
                     }
                 }
                 // 处理DateTime对象
-                else if (rng.Value is DateTime)
+                else if (rng.Value is DateTime time)
                 {
-                    cellDate = (DateTime)rng.Value;
+                    cellDate = time;
                 }
                 else
                 {
@@ -1128,7 +1158,7 @@ namespace Radiant
         {
             try
             {
-                if (CurrentInstanceState.IsRegistered)
+                if (CurrentInstanceState.IsRegistered || savedState)
                 {
                     MessageBox.Show("您已经注册过了！", "注册提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
@@ -1156,10 +1186,7 @@ namespace Radiant
                         CurrentInstanceState.IsRegistered = true;
 
                         // 刷新Ribbon
-                        if (_ribbon != null)
-                        {
-                            _ribbon.Invalidate();
-                        }
+                        _ribbon?.Invalidate();
 
                         MessageBox.Show("注册成功！", "注册结果", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
@@ -1185,6 +1212,10 @@ namespace Radiant
         {
             try
             {
+                if (!savedState) return;
+                if (MessageBox.Show("点击确定则会取消注册状态,所有功能全部无法使用，是否需要取消注册", "警告", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) == DialogResult.Cancel)
+                    return;
+
                 Settings.Default.激活状态 = false;
                 Settings.Default.激活码 = "";
                 Settings.Default.注册码 = "";
@@ -1203,17 +1234,47 @@ namespace Radiant
 
         private void 开启屏幕刷新(Application app)
         {
-            app.ScreenUpdating = true;
-            app.Calculation = XlCalculation.xlCalculationAutomatic;
+            try
+            {
+                app.ScreenUpdating = true;
+                app.Calculation = XlCalculation.xlCalculationAutomatic;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         private void 关闭屏幕刷新(Application app)
         {
-            app.ScreenUpdating = false;
-            app.Calculation = XlCalculation.xlCalculationManual;
+            try
+            {
+                app.ScreenUpdating = false;
+                app.Calculation = XlCalculation.xlCalculationManual;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        private void shifang(object obj)
+        /// <summary>
+        ///  判断是否有活动工作表
+        /// </summary>
+        /// <returns></returns>
+        private bool IsWorksheetActive()
+        {
+            try
+            {
+                return _excelApp.ActiveSheet == null;
+            }
+            catch (Exception)
+            {
+                return true;
+            }
+        }
+
+        private void Shifang(object obj)
         {
             if (obj == null) return;
 
@@ -1226,7 +1287,7 @@ namespace Radiant
                 }
                 else if (obj is Worksheet sheet)
                 {
-                    shifang(sheet.UsedRange);
+                    Shifang(sheet.UsedRange);
                     Marshal.ReleaseComObject(sheet);
                     sheet = null;
                 }

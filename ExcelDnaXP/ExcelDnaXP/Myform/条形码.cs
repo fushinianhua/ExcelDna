@@ -1,161 +1,228 @@
-﻿using System;
+﻿using Microsoft.Office.Interop.Excel;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using ZXing.QrCode;
 using ZXing;
 using ZXing.Common;
-using ExcelAPP = Microsoft.Office.Interop.Excel.Application;
-using Microsoft.Office.Interop.Excel;
-using System.Runtime.InteropServices;
+using ZXing.QrCode;
 using static Radiant.MyCalss.公用;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using ExcelAPP = Microsoft.Office.Interop.Excel.Application;
 
 namespace Radiant.Myform
 {
     public partial class 条形码 : Form
     {
         private ExcelAPP app;
-        private bool IsPiliang = false;
-        private BarType bartype;
+        private bool isPiliang = false;
+        private BarType barType;
         private WorkbookEvents_SheetActivateEventHandler sheetActivateHandler;
+        private int startRow = 1;
+        private Worksheet currentWorksheet;
+        private bool isDisposed = false;
 
-        // 第二个构造函数
+        // 构造函数
+        public 条形码()
+        {
+            InitializeComponent();
+        }
+
+        // 第二个构造函数，接收Excel应用实例
         public 条形码(BarType bar, ExcelAPP excelAPP, bool b = false)
+        {
+            if (excelAPP == null)
+            {
+                throw new ArgumentNullException(nameof(excelAPP), "传入的 ExcelAPP 实例不能为 null");
+            }
+
+            app = excelAPP;
+            barType = bar;
+            isPiliang = b;
+
+            InitializeComponent();
+            InitializeExcelEventHandlers();
+            InitializeFormSettings();
+        }
+
+        private void InitializeExcelEventHandlers()
         {
             try
             {
-                if (excelAPP == null)
-                {
-                    throw new ArgumentNullException(nameof(excelAPP), "传入的 ExcelAPP 实例不能为 null");
-                }
-                app = excelAPP;
                 Workbook activeWorkbook = app.ActiveWorkbook;
                 if (activeWorkbook != null)
                 {
                     sheetActivateHandler = new WorkbookEvents_SheetActivateEventHandler(Wb_SheetActivate);
                     activeWorkbook.SheetActivate += sheetActivateHandler;
                 }
-                // 这里使用 null 条件运算符检查 app 是否为 null
-                Worksheet worksheet = app?.ActiveSheet as Worksheet;
-                if (worksheet != null)
-                {
-                    worksheet.SelectionChange += 事件改变;
-                    this.FontChanged += (sende, e) =>
-                    {
-                        worksheet.SelectionChange -= 事件改变;
-                    };
-                }
 
-                bartype = bar;
-                IsPiliang = b;
-                InitializeComponent();
+                UpdateCurrentWorksheet();
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show($"初始化Excel事件处理程序时出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        private void Wb_SheetActivate(object Sh)
+        private void UpdateCurrentWorksheet()
         {
-            Worksheet worksheet = Sh as Worksheet;
-            if (worksheet != null)
+            // 释放之前的工作表引用
+            if (currentWorksheet != null)
             {
-                GetHeader(worksheet);
+                Marshal.ReleaseComObject(currentWorksheet);
+                currentWorksheet = null;
             }
-        }
 
-        public BarType BarType
-        {
-            set { bartype = value; }
-        }
-
-        private void 事件改变(Range Target)
-        {
-            if (Target.Count > 1)
+            currentWorksheet = app?.ActiveSheet as Worksheet;
+            if (currentWorksheet != null)
             {
-                textBox1.Text = "选择的单元格过多";
-                return;
-            }
-            string text = Target.Value2 + "";
-            if (!string.IsNullOrEmpty(text))
-            {
-                textBox1.Text = text;
+                // 移除之前的事件处理程序，避免重复添加
+                currentWorksheet.SelectionChange -= 事件改变;
+                currentWorksheet.SelectionChange += 事件改变;
+
+                // 窗体关闭时自动移除事件处理程序
+                this.FormClosing += (sender, e) => currentWorksheet.SelectionChange -= 事件改变;
             }
         }
 
-        private void 条形码_Load(object sender, EventArgs e)
+        private void InitializeFormSettings()
         {
-            Worksheet worksheet = (Worksheet)app.ActiveSheet;
             try
             {
-                if (bartype == BarType.QR_CODE)
+                if (barType == BarType.QR_CODE)
                 {
-                    this.Name = "二维码";
-                    label1.Text = "二维码" + "文本";
+                    this.Text = "二维码生成器";
+                    label1.Text = "二维码文本";
                 }
-                else if (bartype == BarType.CODE_128)
+                else if (barType == BarType.CODE_128)
                 {
-                    this.Name = "条形码";
-                    label1.Text = "条形码" + "文本";
+                    this.Text = "条形码生成器";
+                    label1.Text = "条形码文本";
                     pictureBox1.Location = new System.Drawing.Point(50, 150);
                     pictureBox1.Size = new Size(400, 100);
                 }
                 else
                 {
-                    this.Name = "生成码";
-                    label1.Text = "生成码" + "文本";
+                    this.Text = "条码生成器";
+                    label1.Text = "条码文本";
                     pictureBox1.Location = new System.Drawing.Point(50, 150);
                     pictureBox1.Size = new Size(400, 100);
                 }
-                if (IsPiliang)
-                {
-                    SelectCom.Visible = IsPiliang;
-                    LastBut.Visible = IsPiliang;
-                    NextBut.Visible = IsPiliang;
-                    label2.Visible = IsPiliang;
-                    label3.Visible = IsPiliang;
 
-                    if (worksheet != null)
+                if (isPiliang)
+                {
+                    SelectCom.Visible = isPiliang;
+                    LastBut.Visible = isPiliang;
+                    NextBut.Visible = isPiliang;
+                    label2.Visible = isPiliang;
+                    label3.Visible = isPiliang;
+
+                    if (currentWorksheet != null)
                     {
-                        GetHeader(worksheet);
+                        GetHeader(currentWorksheet);
                     }
                 }
+
+                toolTip1.SetToolTip(RowText, "设置表头起始行");
+                UpdateButtonStates();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
-            }
-            finally
-            {
-                if (worksheet != null)
-                { Marshal.ReleaseComObject(worksheet); }
+                MessageBox.Show($"初始化窗体设置时出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
+        private void Wb_SheetActivate(object Sh)
+        {
+            try
+            {
+                if (isDisposed) return;
+
+                UpdateCurrentWorksheet();
+                if (currentWorksheet != null)
+                {
+                    GetHeader(currentWorksheet);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"工作表激活事件处理时出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        public BarType BarType
+        {
+            set { barType = value; }
+        }
+
+        private void 事件改变(Range Target)
+        {
+            try
+            {
+                if (Target == null || Target.Count > 1)
+                {
+                    textBox1.Text = "选择的单元格过多";
+                    return;
+                }
+
+                string text = Target.Value2?.ToString() ?? "";
+                if (!string.IsNullOrEmpty(text))
+                {
+                    textBox1.Text = text;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"选择单元格事件处理时出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// 获取表头
+        /// </summary>
         private void GetHeader(Worksheet worksheet)
         {
+            if (worksheet == null) return;
+
             try
             {
                 SelectCom.Items.Clear();
                 Header.Clear();
-                int col = 0, row = 0;
-                row = worksheet.UsedRange.Rows.Count;
-                col = worksheet.UsedRange.Columns.Count;
-                if (row >= 1 && col > 1)
+
+                Range usedRange = null;
+                Range headerRange = null;
+
+                try
                 {
-                    Range rng = worksheet.Range[worksheet.Cells[1, 1], worksheet.Cells[1, col]];
-                    foreach (Range r in rng)
+                    usedRange = worksheet.UsedRange;
+                    int colCount = usedRange.Columns.Count;
+
+                    if (colCount > 0)
                     {
-                        string va = r.Value2?.ToString();
-                        Header.Add(va);
+                        headerRange = worksheet.Range[worksheet.Cells[startRow, 1], worksheet.Cells[startRow, colCount]];
+
+                        foreach (Range cell in headerRange)
+                        {
+                            string value = cell.Value2?.ToString();
+
+                            // 过滤空值
+                            if (!string.IsNullOrWhiteSpace(value))
+                            {
+                                Header.Add(value);
+                            }
+                        }
                     }
-                    Marshal.ReleaseComObject(rng);
+                }
+                finally
+                {
+                    if (headerRange != null) Marshal.ReleaseComObject(headerRange);
+                    if (usedRange != null) Marshal.ReleaseComObject(usedRange);
                 }
 
                 if (Header.Count > 0)
@@ -163,22 +230,25 @@ namespace Radiant.Myform
                     SelectCom.Items.AddRange(Header.ToArray());
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                MessageBox.Show($"获取表头时出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private List<string> Header = new List<string>();
-        /// <summary>
-        /// 生成码
-        /// </summary>
-        /// <param name="barcodeText">条码文本</param>
-        /// <param name="barcodeFormat">条码类型</param>
-        /// <param name="width">高度</param>
-        /// <param name="height">宽度</param>
 
+        /// <summary>
+        /// 生成条码
+        /// </summary>
         public void GenerateBarcode(string barcodeText, BarcodeFormat barcodeFormat, int width, int height)
         {
+            if (string.IsNullOrEmpty(barcodeText))
+            {
+                MessageBox.Show("条码文本不能为空", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
             var writer = new BarcodeWriter
             {
                 Format = barcodeFormat
@@ -190,7 +260,8 @@ namespace Radiant.Myform
                 {
                     CharacterSet = "UTF-8",
                     Width = width,
-                    Height = height
+                    Height = height,
+                    Margin = 1
                 };
             }
             else
@@ -198,13 +269,15 @@ namespace Radiant.Myform
                 writer.Options = new EncodingOptions
                 {
                     Width = width,
-                    Height = height
+                    Height = height,
+                    Margin = 10
                 };
             }
 
             try
             {
                 var barcodeBitmap = writer.Write(barcodeText);
+                pictureBox1.Image?.Dispose();
                 pictureBox1.Image = barcodeBitmap;
             }
             catch (Exception ex)
@@ -215,46 +288,58 @@ namespace Radiant.Myform
 
         private void button1_Click(object sender, EventArgs e)
         {
+            生成条码(textBox1.Text.Trim());
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
             try
             {
-                生成条码(textBox1.Text.Trim());
+                if (!int.TryParse(RowText.Text, out startRow) || startRow < 1)
+                {
+                    MessageBox.Show("请输入有效的表头起始行号（大于等于1）", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                if (currentWorksheet != null)
+                {
+                    GetHeader(currentWorksheet);
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"发生错误: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"设置表头行时出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private int 当前索引 = -1;
+        private List<string> 数据 = new List<string>();
 
         private void 条形码_KeyDown(object sender, KeyEventArgs e)
         {
             try
             {
-                Keys key = e.KeyCode;
-                switch (key)
+                switch (e.KeyCode)
                 {
                     case Keys.Enter:
                         生成条码(textBox1.Text.Trim());
+                        e.Handled = true;
                         break;
 
                     case Keys.Up:
-
                         LastBar();
+                        e.Handled = true;
                         break;
 
                     case Keys.Down:
-
                         NextBar();
-                        break;
-
-                    default:
+                        e.Handled = true;
                         break;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                MessageBox.Show($"按键处理时出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -268,19 +353,22 @@ namespace Radiant.Myform
         {
             try
             {
-                if (当前索引 <= 0)
-                { return; }
+                if (当前索引 <= 0) return;
+
                 当前索引--;
                 textBox1.Text = 数据[当前索引];
-                生成条码(数据[当前索引]);
-                label3.Text = $"当前显示生成位置:{当前索引 + 1}/{数据.Count}";
 
+                if (ValidateBarcodeText(数据[当前索引]))
+                {
+                    生成条码(数据[当前索引]);
+                }
+
+                label3.Text = $"当前显示生成位置:{当前索引 + 1}/{数据.Count}";
                 UpdateButtonStates();
             }
             catch (Exception ex)
             {
-                // 这里可以添加日志记录或者提示用户
-                Console.WriteLine($"发生错误: {ex.Message}");
+                MessageBox.Show($"切换到上一个条码时出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -288,21 +376,23 @@ namespace Radiant.Myform
         {
             try
             {
-                if (当前索引 == 数据.Count - 1)
-                {
-                    return;
-                }
+                // 修正条件判断：使用 > 而非 >=
+                if (当前索引 >= 数据.Count - 1) return;
+
                 当前索引++;
                 textBox1.Text = 数据[当前索引];
-                生成条码(数据[当前索引]);
-                label3.Text = $"当前显示生成位置:{当前索引 + 1}/{数据.Count}";
 
+                if (ValidateBarcodeText(数据[当前索引]))
+                {
+                    生成条码(数据[当前索引]);
+                }
+
+                label3.Text = $"当前显示生成位置:{当前索引 + 1}/{数据.Count}";
                 UpdateButtonStates();
             }
             catch (Exception ex)
             {
-                // 这里可以添加日志记录或者提示用户
-                Console.WriteLine($"发生错误: {ex.Message}");
+                MessageBox.Show($"切换到下一个条码时出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -322,27 +412,29 @@ namespace Radiant.Myform
             {
                 if (string.IsNullOrEmpty(bartext))
                 {
-                    MessageBox.Show("请输入条码文本", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("请输入条码文本", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
 
-                // 假设 bartype 是一个 ComboBox，并且其 SelectedItem 可以转换为 BarcodeFormat
-                if (Enum.TryParse(bartype.ToString(), out BarcodeFormat barcodeFormat))
+                if (!ValidateBarcodeText(bartext))
                 {
-                    GenerateBarcode(前缀Text + bartext, barcodeFormat, pictureBox1.Width, pictureBox1.Height);
+                    return;
+                }
+
+                if (Enum.TryParse(barType.ToString(), out BarcodeFormat barcodeFormat))
+                {
+                    GenerateBarcode(前缀Text.Text + bartext, barcodeFormat, pictureBox1.Width, pictureBox1.Height);
                 }
                 else
                 {
-                    MessageBox.Show("请选择有效的条码类型", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("无效的条码类型", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show($"生成条码时出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
-        private List<string> 数据 = new List<string>();
 
         private void SelectCom_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -353,23 +445,129 @@ namespace Radiant.Myform
                 数据.Clear();
                 textBox1.Text = string.Empty;
                 label3.Text = "当前显示位置为:";
-                LastBut.Enabled = false;
-                NextBut.Enabled = true;
-                this.Focus();
-                int col = SelectCom.SelectedIndex + 1;
-                Worksheet sheet = (Worksheet)app.ActiveSheet;
-                Range r = sheet.UsedRange;
-                Range rng = r.Columns[col];
-                object[,] values = rng.Value;
-                for (int i = 2; i <= values.GetLength(0); i++)
+                UpdateButtonStates();
+
+                if (SelectCom.SelectedIndex < 0 || currentWorksheet == null) return;
+
+                int colIndex = SelectCom.SelectedIndex + 1;
+                Range usedRange = null;
+                Range columnRange = null;
+
+                try
                 {
-                    string value = values[i, 1].ToString();
-                    数据.Add(value);
+                    usedRange = currentWorksheet.UsedRange;
+                    columnRange = usedRange.Columns[colIndex];
+
+                    object[,] values = columnRange.Value as object[,];
+                    if (values != null)
+                    {
+                        for (int i = startRow + 1; i <= values.GetLength(0); i++)
+                        {
+                            if (values[i, 1] != null)
+                            {
+                                数据.Add(values[i, 1].ToString());
+                            }
+                        }
+                    }
+
+                    if (数据.Count > 0)
+                    {
+                        当前索引 = 0;
+                        textBox1.Text = 数据[0];
+
+                        // 确保至少有一个有效数据
+                        if (ValidateBarcodeText(数据[0]))
+                        {
+                            生成条码(数据[0]);
+                        }
+
+                        label3.Text = $"当前显示生成位置:{当前索引 + 1}/{数据.Count}";
+                        UpdateButtonStates();
+                    }
+                    else
+                    {
+                        MessageBox.Show("所选列中没有有效数据", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+                finally
+                {
+                    if (columnRange != null) Marshal.ReleaseComObject(columnRange);
+                    if (usedRange != null) Marshal.ReleaseComObject(usedRange);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show($"加载列数据时出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                bool result = bool.Parse(Tag.ToString());
+                this.Tag = !result;
+                this.TopMost = !result;
+                button3.Text = result ? "置顶" : "取消置顶";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"设置窗口置顶状态时出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// 验证条码文本是否有效
+        /// </summary>
+        private bool ValidateBarcodeText(string text)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(text))
+                {
+                    MessageBox.Show("条码文本不能为空", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
+                }
+
+                // 二维码最大字符限制
+                if (barType == BarType.QR_CODE && text.Length > 7089)
+                {
+                    MessageBox.Show("二维码文本过长（最大支持7089个数字或4296个字符）", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
+                }
+
+                // 检查是否包含不支持的字符
+                string invalidChars = @"<>:""/\|?*";
+                if (text.Any(c => invalidChars.Contains(c)))
+                {
+                    MessageBox.Show("文本包含不支持的字符，请避免使用: <>:/\"|? *", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"验证条码文本时出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                int.TryParse(跳转行text.Text, out int newStartRow);
+                if (newStartRow >= 0 && newStartRow <= 数据.Count)
+                {
+                    string str = 数据[newStartRow - 1];
+                    textBox1.Text = str;
+                    生成条码(str);
+                }
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
     }

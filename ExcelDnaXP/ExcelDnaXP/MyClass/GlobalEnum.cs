@@ -83,6 +83,7 @@ namespace Radiant.MyClass
 
             public 属性枚举 图片属性 { get; set; }
             public bool 嵌入单元格 { get; set; }
+            public bool 保持纵横比 { get; set; }
         }
 
         public class 图片尺寸
@@ -95,6 +96,45 @@ namespace Radiant.MyClass
             public double 右边距 { get; set; } = 0;
             public double 旋转角度 { get; set; } = 0;
             public double 缩放比例 { get; set; } = 0.55;
+        }
+
+        /// <summary>
+        /// Excel单元格转换
+        /// </summary>
+        public static class ExcelUnitConverter
+        {
+            // 默认DPI（大多数显示器）
+            private const double DefaultDpi = 96;
+
+            // 字符平均宽度（像素）
+            private const double CharWidth = 7;
+
+            // 列宽额外像素（边距）
+            private const double ColumnPadding = 2;
+
+            // 列宽转像素
+            public static double ColumnWidthToPixels(double columnWidth)
+            {
+                return columnWidth * CharWidth + ColumnPadding;
+            }
+
+            // 像素转列宽
+            public static double PixelsToColumnWidth(double pixels)
+            {
+                return (pixels - ColumnPadding) / CharWidth;
+            }
+
+            // 行高转像素
+            public static double RowHeightToPixels(double rowHeight, double dpi = DefaultDpi)
+            {
+                return rowHeight * (dpi / 72);
+            }
+
+            // 像素转行高
+            public static double PixelsToRowHeight(double pixels, double dpi = DefaultDpi)
+            {
+                return pixels * (72 / dpi);
+            }
         }
     }
 }

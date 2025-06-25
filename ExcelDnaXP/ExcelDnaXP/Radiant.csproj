@@ -41,6 +41,9 @@
     <Reference Include="ExcelDna.Integration, Version=1.1.0.0, Culture=neutral, PublicKeyToken=f225e9659857edbe, processorArchitecture=MSIL">
       <HintPath>..\packages\ExcelDna.Integration.1.1.0\lib\ExcelDna.Integration.dll</HintPath>
     </Reference>
+    <Reference Include="HtmlAgilityPack, Version=1.12.1.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>..\packages\HtmlAgilityPack.1.12.1\lib\Net45\HtmlAgilityPack.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Office.Interop.Excel, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <HintPath>..\packages\ExcelDna.Interop.15.0.1\lib\net452\Microsoft.Office.Interop.Excel.dll</HintPath>
       <EmbedInteropTypes>True</EmbedInteropTypes>
@@ -83,6 +86,12 @@
     <Compile Include="MyClass\ItemData.cs" />
     <Compile Include="MyClass\加密算法.cs" />
     <Compile Include="MyClass\公用.cs" />
+    <Compile Include="Myform\分列.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Myform\分列.Designer.cs">
+      <DependentUpon>分列.cs</DependentUpon>
+    </Compile>
     <Compile Include="Myform\名字输入.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -112,6 +121,12 @@
     </Compile>
     <Compile Include="Myform\注册界面.Designer.cs">
       <DependentUpon>注册界面.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Myform\网页.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Myform\网页.Designer.cs">
+      <DependentUpon>网页.cs</DependentUpon>
     </Compile>
     <Compile Include="MyFunctions.cs" />
     <Compile Include="MyRibbon.cs" />
@@ -145,6 +160,9 @@
     <EmbeddedResource Include="Myform\注册界面.resx">
       <DependentUpon>注册界面.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Myform\网页.resx">
+      <DependentUpon>网页.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -172,7 +190,7 @@
     <EmbeddedResource Include="RibbonResources\填充选择.png" />
     <EmbeddedResource Include="RibbonResources\关.png" />
     <EmbeddedResource Include="RibbonResources\二维码.png" />
-    <EmbeddedResource Include="RibbonResources\删除批注 .png" />
+    <EmbeddedResource Include="RibbonResources\删除批注.png" />
     <EmbeddedResource Include="RibbonResources\破解密码.png" />
     <EmbeddedResource Include="RibbonResources\图片.png" />
     <Content Include="RibbonResources\大写.png" />

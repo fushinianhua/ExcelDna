@@ -21,7 +21,7 @@ namespace Radiant.MyForm
     public partial class 数据对比 : Form
     {
         // Excel应用程序实例
-        private Application excelapp;
+        private readonly Application excelapp;
 
         // 标记颜色
         private Color? selectColor = Color.Yellow;
@@ -35,9 +35,9 @@ namespace Radiant.MyForm
         private Range 区域二 = null;
 
         // 对比结果区域
-        private List<Range> 相同Rng = new List<Range>();
+        private readonly List<Range> 相同Rng = new List<Range>();
 
-        private List<Range> 不同Rng = new List<Range>();
+        private readonly List<Range> 不同Rng = new List<Range>();
 
         // 对比结果键集合
         private HashSet<string> commonKeys;
@@ -53,9 +53,6 @@ namespace Radiant.MyForm
 
         // 不同项标识
         private bool 不同项标识 = false;
-
-        // 用于记录是否正在执行Excel操作
-        private bool isProcessingExcel = false;
 
         public 数据对比(Application application)
         {
@@ -161,12 +158,11 @@ namespace Radiant.MyForm
         /// <summary>
         /// 选择第一个对比区域
         /// </summary>
-        private void pictureBox1_Click(object sender, EventArgs e)
+        private void PictureBox1_Click(object sender, EventArgs e)
         {
             try
             {
                 this.TopMost = false;
-                ShowWaitCursor();
                 BringExcelToFront();
                 this.Hide();
 
@@ -185,24 +181,18 @@ namespace Radiant.MyForm
             }
             catch (Exception ex)
             {
-                LogException("选择区域一失败", ex);
                 MessageBox.Show($"选择区域一失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            finally
-            {
-                HideWaitCursor();
             }
         }
 
         /// <summary>
         /// 选择第二个对比区域
         /// </summary>
-        private void pictureBox2_Click(object sender, EventArgs e)
+        private void PictureBox2_Click(object sender, EventArgs e)
         {
             try
             {
                 this.TopMost = false;
-                ShowWaitCursor();
                 BringExcelToFront();
                 this.Hide();
 
@@ -221,12 +211,7 @@ namespace Radiant.MyForm
             }
             catch (Exception ex)
             {
-                LogException("选择区域二失败", ex);
                 MessageBox.Show($"选择区域二失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            finally
-            {
-                HideWaitCursor();
             }
         }
 
@@ -273,7 +258,6 @@ namespace Radiant.MyForm
             try
             {
                 this.TopMost = true;
-                ShowWaitCursor();
 
                 // 清空之前的结果
                 相同Rng.Clear();
@@ -282,18 +266,14 @@ namespace Radiant.MyForm
                 if (string.IsNullOrEmpty(区域1Box.Text) || string.IsNullOrEmpty(区域2Box.Text))
                 {
                     MessageBox.Show("请先选择两个对比区域", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    HideWaitCursor();
                     return;
                 }
 
                 // 获取数据
-                object[,] data1 = 区域一.Value2 as object[,];
-                object[,] data2 = 区域二.Value2 as object[,];
 
-                if (data1 == null || data2 == null)
+                if (!(区域一.Value2 is object[,] data1) || !(区域二.Value2 is object[,] data2))
                 {
                     MessageBox.Show("无法获取数据，请确保选择了有效区域", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    HideWaitCursor();
                     return;
                 }
 
@@ -322,17 +302,10 @@ namespace Radiant.MyForm
 
                 // 更新显示
                 UpdateDisplay(commonKeys, uniqueKeys1, uniqueKeys2);
-
-                LogInformation($"对比完成 - 相同项: {commonKeys.Count}, 区域一独有: {uniqueKeys1.Count}, 区域二独有: {uniqueKeys2.Count}");
             }
             catch (Exception ex)
             {
-                LogException("对比数据失败", ex);
                 MessageBox.Show($"对比数据失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            finally
-            {
-                HideWaitCursor();
             }
         }
 
@@ -362,7 +335,7 @@ namespace Radiant.MyForm
             }
             catch (Exception ex)
             {
-                LogWarning($"合并Range失败: {ex.Message}");
+                MessageBox.Show($"无法合并Range: {ex.Message}");
                 return null;
             }
         }
@@ -392,7 +365,7 @@ namespace Radiant.MyForm
                 }
                 catch (Exception ex)
                 {
-                    LogWarning($"无法合并Range: {ex.Message}");
+                    MessageBox.Show($"无法合并Range: {ex.Message}");
                 }
             }
 
@@ -497,7 +470,6 @@ namespace Radiant.MyForm
             }
             catch (Exception ex)
             {
-                LogException("标记相同项失败", ex);
                 MessageBox.Show($"标记相同项失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -520,7 +492,7 @@ namespace Radiant.MyForm
             }
             catch (Exception ex)
             {
-                LogWarning($"合并Range失败: {ex.Message}");
+                MessageBox.Show($"无法合并Range: {ex.Message}");
                 return null;
             }
         }
@@ -564,7 +536,6 @@ namespace Radiant.MyForm
             }
             catch (Exception ex)
             {
-                LogException("标记不同项失败", ex);
                 MessageBox.Show($"标记不同项失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -613,7 +584,6 @@ namespace Radiant.MyForm
             }
             catch (Exception ex)
             {
-                LogException("清除标记失败", ex);
                 MessageBox.Show($"清除标记失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -657,7 +627,6 @@ namespace Radiant.MyForm
             }
             catch (Exception ex)
             {
-                LogException("导出相同项失败", ex);
                 MessageBox.Show($"导出相同项失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -676,8 +645,8 @@ namespace Radiant.MyForm
                 // 处理不同类型的值
                 if (valueList[i] == null)
                     result[i, 0] = "∅";
-                else if (valueList[i] is bool)
-                    result[i, 0] = (bool)valueList[i] ? "TRUE" : "FALSE";
+                else if (valueList[i] is bool v)
+                    result[i, 0] = v ? "TRUE" : "FALSE";
                 else
                     result[i, 0] = valueList[i].ToString();
             }
@@ -725,7 +694,6 @@ namespace Radiant.MyForm
             }
             catch (Exception ex)
             {
-                LogException("导出不同项失败", ex);
                 MessageBox.Show($"导出不同项失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -801,23 +769,6 @@ namespace Radiant.MyForm
         }
 
         /// <summary>
-        /// 显示等待光标
-        /// </summary>
-        private void ShowWaitCursor()
-        {
-            isProcessingExcel = true;
-        }
-
-        /// <summary>
-        /// 隐藏等待光标
-        /// </summary>
-        private void HideWaitCursor()
-        {
-            this.Cursor = Cursors.Default;
-            isProcessingExcel = false;
-        }
-
-        /// <summary>
         /// 将Excel窗口置于前台
         /// </summary>
         private void BringExcelToFront()
@@ -844,29 +795,8 @@ namespace Radiant.MyForm
             }
             catch (Exception ex)
             {
-                LogWarning($"释放COM对象失败: {ex.Message}");
+                MessageBox.Show($"释放COM对象失败: {ex.Message}");
             }
-        }
-
-        /// <summary>
-        /// 记录信息日志
-        /// </summary>
-        private void LogInformation(string message)
-        {
-        }
-
-        /// <summary>
-        /// 记录警告日志
-        /// </summary>
-        private void LogWarning(string message)
-        {
-        }
-
-        /// <summary>
-        /// 记录异常日志
-        /// </summary>
-        private void LogException(string message, Exception ex)
-        {
         }
     }
 }

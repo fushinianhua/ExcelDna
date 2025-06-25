@@ -14,7 +14,7 @@ namespace Radiant
             string extension = Path.GetExtension(resourceName).ToLower();                 //扩展名
 
             if (!resourcedir.StartsWith(".")) resourcedir = "." + resourcedir;
-            if (!resourcedir.EndsWith(".")) resourcedir = resourcedir + ".";
+            if (!resourcedir.EndsWith(".")) resourcedir += ".";
             string sourcename = typeof(ResourceHelper).Assembly.GetName().Name + ".RibbonResources" + resourcedir + resourceName;
 
             using (Stream ressourceStream = assm.GetManifestResourceStream(sourcename))
@@ -46,7 +46,7 @@ namespace Radiant
             Assembly assm = Assembly.GetExecutingAssembly();
 
             if (!resourcedir.StartsWith(".")) resourcedir = "." + resourcedir;
-            if (!resourcedir.EndsWith(".")) resourcedir = resourcedir + ".";
+            if (!resourcedir.EndsWith(".")) resourcedir += ".";
             string sourcename = typeof(ResourceHelper).Assembly.GetName().Name + ".MyRibbon" + resourcedir + resourceName;
 
             using (Stream streamText = assm.GetManifestResourceStream(sourcename))
