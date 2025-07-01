@@ -3,28 +3,36 @@
   "WorkspaceRootPath": "D:\\Github_project\\ExcelDna\\ExcelDnaXP\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{6990FCF5-5CB3-4B9F-82FF-875FBE12190C}|ExcelDnaXP\\Radiant.csproj|d:\\github_project\\exceldna\\exceldnaxp\\exceldnaxp\\myribbon.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{6990FCF5-5CB3-4B9F-82FF-875FBE12190C}|ExcelDnaXP\\Radiant.csproj|d:\\github_project\\exceldna\\exceldnaxp\\exceldnaxp\\myform\\\u6587\u5B57\u8BC6\u522B.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6990FCF5-5CB3-4B9F-82FF-875FBE12190C}|ExcelDnaXP\\Radiant.csproj|solutionrelative:exceldnaxp\\myform\\\u6587\u5B57\u8BC6\u522B.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6990FCF5-5CB3-4B9F-82FF-875FBE12190C}|ExcelDnaXP\\Radiant.csproj|d:\\github_project\\exceldna\\exceldnaxp\\exceldnaxp\\myform\\\u6587\u5B57\u8BC6\u522B.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{6990FCF5-5CB3-4B9F-82FF-875FBE12190C}|ExcelDnaXP\\Radiant.csproj|solutionrelative:exceldnaxp\\myform\\\u6587\u5B57\u8BC6\u522B.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6990FCF5-5CB3-4B9F-82FF-875FBE12190C}|ExcelDnaXP\\Radiant.csproj|D:\\Github_project\\ExcelDna\\ExcelDnaXP\\exceldnaxp\\myribbon.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{6990FCF5-5CB3-4B9F-82FF-875FBE12190C}|ExcelDnaXP\\Radiant.csproj|solutionrelative:exceldnaxp\\myribbon.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{6990FCF5-5CB3-4B9F-82FF-875FBE12190C}|ExcelDnaXP\\Radiant.csproj|d:\\github_project\\exceldna\\exceldnaxp\\exceldnaxp\\myform\\\u7F51\u9875.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6990FCF5-5CB3-4B9F-82FF-875FBE12190C}|ExcelDnaXP\\Radiant.csproj|solutionrelative:exceldnaxp\\myform\\\u7F51\u9875.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{6990FCF5-5CB3-4B9F-82FF-875FBE12190C}|ExcelDnaXP\\Radiant.csproj|d:\\github_project\\exceldna\\exceldnaxp\\exceldnaxp\\myform\\\u7F51\u9875.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
-      "RelativeMoniker": "D:0:0:{6990FCF5-5CB3-4B9F-82FF-875FBE12190C}|ExcelDnaXP\\Radiant.csproj|solutionrelative:exceldnaxp\\myform\\\u7F51\u9875.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     },
     {
       "AbsoluteMoniker": "D:0:0:{6990FCF5-5CB3-4B9F-82FF-875FBE12190C}|ExcelDnaXP\\Radiant.csproj|D:\\Github_project\\ExcelDna\\ExcelDnaXP\\exceldnaxp\\myribbon\\ribbon.xml||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
       "RelativeMoniker": "D:0:0:{6990FCF5-5CB3-4B9F-82FF-875FBE12190C}|ExcelDnaXP\\Radiant.csproj|solutionrelative:exceldnaxp\\myribbon\\ribbon.xml||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{6990FCF5-5CB3-4B9F-82FF-875FBE12190C}|ExcelDnaXP\\Radiant.csproj|d:\\github_project\\exceldna\\exceldnaxp\\exceldnaxp\\myform\\\u6570\u636E\u5BF9\u6BD4.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6990FCF5-5CB3-4B9F-82FF-875FBE12190C}|ExcelDnaXP\\Radiant.csproj|solutionrelative:exceldnaxp\\myform\\\u6570\u636E\u5BF9\u6BD4.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{6990FCF5-5CB3-4B9F-82FF-875FBE12190C}|ExcelDnaXP\\Radiant.csproj|d:\\github_project\\exceldna\\exceldnaxp\\exceldnaxp\\myform\\\u6587\u5B57\u8BC6\u522B.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6990FCF5-5CB3-4B9F-82FF-875FBE12190C}|ExcelDnaXP\\Radiant.csproj|solutionrelative:exceldnaxp\\myform\\\u6587\u5B57\u8BC6\u522B.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{6990FCF5-5CB3-4B9F-82FF-875FBE12190C}|ExcelDnaXP\\Radiant.csproj|d:\\github_project\\exceldna\\exceldnaxp\\exceldnaxp\\myclass\\resourcehelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6990FCF5-5CB3-4B9F-82FF-875FBE12190C}|ExcelDnaXP\\Radiant.csproj|solutionrelative:exceldnaxp\\myclass\\resourcehelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{6990FCF5-5CB3-4B9F-82FF-875FBE12190C}|ExcelDnaXP\\Radiant.csproj|d:\\github_project\\exceldna\\exceldnaxp\\exceldnaxp\\myform\\\u56FE\u7247\u5BFC\u5165\u8BBE\u7F6E.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6990FCF5-5CB3-4B9F-82FF-875FBE12190C}|ExcelDnaXP\\Radiant.csproj|solutionrelative:exceldnaxp\\myform\\\u56FE\u7247\u5BFC\u5165\u8BBE\u7F6E.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6990FCF5-5CB3-4B9F-82FF-875FBE12190C}|ExcelDnaXP\\Radiant.csproj|d:\\github_project\\exceldna\\exceldnaxp\\exceldnaxp\\myform\\\u7F51\u9875.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6990FCF5-5CB3-4B9F-82FF-875FBE12190C}|ExcelDnaXP\\Radiant.csproj|solutionrelative:exceldnaxp\\myform\\\u7F51\u9875.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6990FCF5-5CB3-4B9F-82FF-875FBE12190C}|ExcelDnaXP\\Radiant.csproj|D:\\Github_project\\ExcelDna\\ExcelDnaXP\\exceldnaxp\\myform\\\u7F51\u9875.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{6990FCF5-5CB3-4B9F-82FF-875FBE12190C}|ExcelDnaXP\\Radiant.csproj|solutionrelative:exceldnaxp\\myform\\\u7F51\u9875.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     },
     {
       "AbsoluteMoniker": "D:0:0:{6990FCF5-5CB3-4B9F-82FF-875FBE12190C}|ExcelDnaXP\\Radiant.csproj|D:\\Github_project\\ExcelDna\\ExcelDnaXP\\exceldnaxp\\myclass\\globalenum.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -38,12 +46,8 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 8,
+          "SelectedChildIndex": 5,
           "Children": [
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{eefa5220-e298-11d0-8f78-00a0c9110057}"
-            },
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{b1e99781-ab81-11d0-b683-00aa00a3ee26}"
@@ -53,21 +57,76 @@
               "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
             },
             {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{eefa5220-e298-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "\u6587\u5B57\u8BC6\u522B.Designer.cs",
+              "DocumentMoniker": "D:\\Github_project\\ExcelDna\\ExcelDnaXP\\ExcelDnaXP\\Myform\\\u6587\u5B57\u8BC6\u522B.Designer.cs",
+              "RelativeDocumentMoniker": "ExcelDnaXP\\Myform\\\u6587\u5B57\u8BC6\u522B.Designer.cs",
+              "ToolTip": "D:\\Github_project\\ExcelDna\\ExcelDnaXP\\ExcelDnaXP\\Myform\\\u6587\u5B57\u8BC6\u522B.Designer.cs",
+              "RelativeToolTip": "ExcelDnaXP\\Myform\\\u6587\u5B57\u8BC6\u522B.Designer.cs",
+              "ViewState": "AgIAAE8AAAAAAAAAAAAkwHwAAAAlAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-01T07:23:09.349Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "\u56FE\u7247\u5BFC\u5165\u8BBE\u7F6E.cs",
+              "DocumentMoniker": "D:\\Github_project\\ExcelDna\\ExcelDnaXP\\ExcelDnaXP\\Myform\\\u56FE\u7247\u5BFC\u5165\u8BBE\u7F6E.cs",
+              "RelativeDocumentMoniker": "ExcelDnaXP\\Myform\\\u56FE\u7247\u5BFC\u5165\u8BBE\u7F6E.cs",
+              "ToolTip": "D:\\Github_project\\ExcelDna\\ExcelDnaXP\\ExcelDnaXP\\Myform\\\u56FE\u7247\u5BFC\u5165\u8BBE\u7F6E.cs",
+              "RelativeToolTip": "ExcelDnaXP\\Myform\\\u56FE\u7247\u5BFC\u5165\u8BBE\u7F6E.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-01T05:06:51.413Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "\u6587\u5B57\u8BC6\u522B.cs",
+              "DocumentMoniker": "D:\\Github_project\\ExcelDna\\ExcelDnaXP\\ExcelDnaXP\\Myform\\\u6587\u5B57\u8BC6\u522B.cs",
+              "RelativeDocumentMoniker": "ExcelDnaXP\\Myform\\\u6587\u5B57\u8BC6\u522B.cs",
+              "ToolTip": "D:\\Github_project\\ExcelDna\\ExcelDnaXP\\ExcelDnaXP\\Myform\\\u6587\u5B57\u8BC6\u522B.cs",
+              "RelativeToolTip": "ExcelDnaXP\\Myform\\\u6587\u5B57\u8BC6\u522B.cs",
+              "ViewState": "AgIAAJcAAAAAAAAAAAAIwKMAAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-01T05:05:44.323Z",
+              "EditorCaption": ""
+            },
+            {
               "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "\u6587\u5B57\u8BC6\u522B.cs [\u8BBE\u8BA1]",
+              "DocumentMoniker": "D:\\Github_project\\ExcelDna\\ExcelDnaXP\\ExcelDnaXP\\Myform\\\u6587\u5B57\u8BC6\u522B.cs",
+              "RelativeDocumentMoniker": "ExcelDnaXP\\Myform\\\u6587\u5B57\u8BC6\u522B.cs",
+              "ToolTip": "D:\\Github_project\\ExcelDna\\ExcelDnaXP\\ExcelDnaXP\\Myform\\\u6587\u5B57\u8BC6\u522B.cs [\u8BBE\u8BA1]",
+              "RelativeToolTip": "ExcelDnaXP\\Myform\\\u6587\u5B57\u8BC6\u522B.cs [\u8BBE\u8BA1]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-01T05:00:33.483Z",
+              "EditorCaption": " [\u8BBE\u8BA1]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
               "Title": "\u7F51\u9875.cs",
               "DocumentMoniker": "D:\\Github_project\\ExcelDna\\ExcelDnaXP\\ExcelDnaXP\\Myform\\\u7F51\u9875.cs",
               "RelativeDocumentMoniker": "ExcelDnaXP\\Myform\\\u7F51\u9875.cs",
               "ToolTip": "D:\\Github_project\\ExcelDna\\ExcelDnaXP\\ExcelDnaXP\\Myform\\\u7F51\u9875.cs",
               "RelativeToolTip": "ExcelDnaXP\\Myform\\\u7F51\u9875.cs",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAAABEAAAAJAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAYAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-06-25T10:35:50.321Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 7,
               "Title": "\u7F51\u9875.cs [\u8BBE\u8BA1]",
               "DocumentMoniker": "D:\\Github_project\\ExcelDna\\ExcelDnaXP\\ExcelDnaXP\\Myform\\\u7F51\u9875.cs",
               "RelativeDocumentMoniker": "ExcelDnaXP\\Myform\\\u7F51\u9875.cs",
@@ -79,33 +138,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "\u6570\u636E\u5BF9\u6BD4.cs",
-              "DocumentMoniker": "D:\\Github_project\\ExcelDna\\ExcelDnaXP\\ExcelDnaXP\\Myform\\\u6570\u636E\u5BF9\u6BD4.cs",
-              "RelativeDocumentMoniker": "ExcelDnaXP\\Myform\\\u6570\u636E\u5BF9\u6BD4.cs",
-              "ToolTip": "D:\\Github_project\\ExcelDna\\ExcelDnaXP\\ExcelDnaXP\\Myform\\\u6570\u636E\u5BF9\u6BD4.cs",
-              "RelativeToolTip": "ExcelDnaXP\\Myform\\\u6570\u636E\u5BF9\u6BD4.cs",
-              "ViewState": "AgIAALoAAAAAAAAAAAD4v74AAAAWAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-25T10:14:09.275Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "ResourceHelper.cs",
-              "DocumentMoniker": "D:\\Github_project\\ExcelDna\\ExcelDnaXP\\ExcelDnaXP\\MyClass\\ResourceHelper.cs",
-              "RelativeDocumentMoniker": "ExcelDnaXP\\MyClass\\ResourceHelper.cs",
-              "ToolTip": "D:\\Github_project\\ExcelDna\\ExcelDnaXP\\ExcelDnaXP\\MyClass\\ResourceHelper.cs",
-              "RelativeToolTip": "ExcelDnaXP\\MyClass\\ResourceHelper.cs",
-              "ViewState": "AgIAAAEAAAAAAAAAAAAkwBAAAAA5AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-25T03:08:50.742Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 8,
               "Title": "GlobalEnum.cs",
               "DocumentMoniker": "D:\\Github_project\\ExcelDna\\ExcelDnaXP\\ExcelDnaXP\\MyClass\\GlobalEnum.cs",
               "RelativeDocumentMoniker": "ExcelDnaXP\\MyClass\\GlobalEnum.cs",
@@ -113,19 +146,7 @@
               "RelativeToolTip": "ExcelDnaXP\\MyClass\\GlobalEnum.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAIgAAAANAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-19T03:23:34.171Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "MyRibbon.cs",
-              "DocumentMoniker": "D:\\Github_project\\ExcelDna\\ExcelDnaXP\\ExcelDnaXP\\MyRibbon.cs",
-              "RelativeDocumentMoniker": "ExcelDnaXP\\MyRibbon.cs",
-              "ToolTip": "D:\\Github_project\\ExcelDna\\ExcelDnaXP\\ExcelDnaXP\\MyRibbon.cs",
-              "RelativeToolTip": "ExcelDnaXP\\MyRibbon.cs",
-              "ViewState": "AgIAALMCAAAAAAAAAAAAAMACAAAjAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-16T06:54:51.54Z",
+              "WhenOpened": "2025-06-19T03:23:34.171Z",
               "EditorCaption": ""
             },
             {
@@ -136,9 +157,22 @@
               "RelativeDocumentMoniker": "ExcelDnaXP\\MyRibbon\\Ribbon.xml",
               "ToolTip": "D:\\Github_project\\ExcelDna\\ExcelDnaXP\\ExcelDnaXP\\MyRibbon\\Ribbon.xml",
               "RelativeToolTip": "ExcelDnaXP\\MyRibbon\\Ribbon.xml",
-              "ViewState": "AgIAABsAAAAAAAAAAAAAADMAAAAMAAAAAAAAAA==",
+              "ViewState": "AgIAABIAAAAAAAAAAAAAACkAAABFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003576|",
               "WhenOpened": "2025-04-09T07:27:18.681Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "MyRibbon.cs",
+              "DocumentMoniker": "D:\\Github_project\\ExcelDna\\ExcelDnaXP\\ExcelDnaXP\\MyRibbon.cs",
+              "RelativeDocumentMoniker": "ExcelDnaXP\\MyRibbon.cs",
+              "ToolTip": "D:\\Github_project\\ExcelDna\\ExcelDnaXP\\ExcelDnaXP\\MyRibbon.cs",
+              "RelativeToolTip": "ExcelDnaXP\\MyRibbon.cs",
+              "ViewState": "AgIAADoCAAAAAAAAAADwv0gCAAAaAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-16T06:54:51.54Z",
               "EditorCaption": ""
             }
           ]

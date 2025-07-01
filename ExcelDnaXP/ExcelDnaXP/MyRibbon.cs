@@ -91,9 +91,9 @@ namespace Radiant
             RegisterWorkbookEvents();
 
             //打开指定工作簿（仅在当前实例执行）
-            //if (!string.IsNullOrEmpty("C:\\Users\\辛鹏\\Desktop\\test.xlsx"))
+            //if (!string.IsNullOrEmpty("C:\\Users\\辛鹏\\Desktop\\123.xlsx"))
             //{
-            //    _excelApp.Workbooks.Open("C:\\Users\\辛鹏\\Desktop\\test.xlsx");
+            //    _excelApp.Workbooks.Open("C:\\Users\\辛鹏\\Desktop\\123.xlsx");
             //}
 
             // 初始化状态
@@ -577,6 +577,19 @@ namespace Radiant
             }
         }
 
+        public void 识别图片(IRibbonControl control)
+        {
+            try
+            {
+                文字识别 识别 = new 文字识别();
+                识别.Show();
+            }
+            catch (Exception EX)
+            {
+                MessageBox.Show(EX.Message);
+            }
+        }
+
         public void 破解VBA密码(IRibbonControl control)
         {
             try
@@ -952,7 +965,7 @@ namespace Radiant
                 foreach (Range cell in rng3.Cells)
                 {
                     if (cell.Value2 == null) { continue; }
-                    if (!int.TryParse(cell.Value.ToString(), out int number))
+                    if (!double.TryParse(cell.Value.ToString(), out double number))
                     {
                         ranges.Add(cell);
                     }

@@ -86,6 +86,7 @@
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(443, 30);
             this.textBox1.TabIndex = 1;
+            this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             // 
             // groupBox1
             // 
@@ -414,6 +415,7 @@
             this.TileLabel.Size = new System.Drawing.Size(521, 29);
             this.TileLabel.TabIndex = 4;
             this.TileLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.TileLabel.Click += new System.EventHandler(this.TileLabel_Click);
             // 
             // 图片导入设置
             // 

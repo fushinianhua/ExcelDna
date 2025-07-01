@@ -39,6 +39,7 @@
 					<menu id="ImageMenu" label="图片管理" image="图片" getEnabled='GetButtonEnabled'>
 						<button id="InsertImage" label="插入图片" onAction="插入图片" image="插入图片" screentip="插入图片" getEnabled="GetButtonEnabled" />
 						<button id="BatchInsertImage" label="批量插入图片" onAction="批量插入图片" image="插入图片" screentip="批量插入图片" getEnabled="GetButtonEnabled" />
+						<button id ="OCRImage" label="识别图片" onAction="识别图片" image="插入图片" screentip="识别图片" getEnabled="GetButtonEnabled" />
 					</menu>
 				</group>
 
@@ -50,9 +51,11 @@
 						<button id="BatchGenerateBarcode" label="批量生成条码" onAction="批量生成条形码" image="二维码" screentip="批量生成条形码" />
 					</menu>
 				</group>
+				<!--
 				<group id="WebGroup" label="网页操作">
 					<button id="GenerateWebPage" label="打开网页" onAction="打开网页" image="Image1" size="normal" getEnabled="GetButtonEnabled" />
 				</group>
+				-->
 				<!-- ===================== 系统管理 ===================== -->
 				<group id="SystemGroup" label="系统管理">
 					<button id="RegisterButton" label="注册" onAction="注册" image="注册" size="large" screentip="注册后解锁全部功能" />
